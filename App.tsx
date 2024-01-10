@@ -1,24 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
-import { SafeAreaView, StyleSheet, Text } from 'react-native';
-import SignIn from './components/SignIn';
-import SignUp from './components/SignUp';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Main from './components/Main';
+import { PaperProvider } from 'react-native-paper';
 
 export default function App() {
     return (
-        <SafeAreaView style={styles.container}>
-            <Text>Tournament Manager</Text>
-            <SignIn/>
-            <SignUp/>
-            <StatusBar style="auto" />
-        </SafeAreaView>
+        <PaperProvider>
+            <SafeAreaProvider>
+                <Main />
+            </SafeAreaProvider>
+        </PaperProvider>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});
