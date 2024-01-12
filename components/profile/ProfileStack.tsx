@@ -1,15 +1,11 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Profile from "./Profile";
-import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import { secondary, tertiary } from "../../theme/colors";
-import { useNavigation } from "@react-navigation/native";
 
 const Stack = createNativeStackNavigator();
 
-const ProfileStack = ({ token, setToken }: any) => {
-    const navigation = useNavigation()
-
+const ProfileStack = ({ navigation, token, setToken }: any) => {
     return (
         <Stack.Navigator
             screenOptions={{

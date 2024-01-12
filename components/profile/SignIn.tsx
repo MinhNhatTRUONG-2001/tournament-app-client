@@ -1,12 +1,12 @@
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
-import { primary } from "../../theme/colors";
+import { error, primary } from "../../theme/colors";
 import CustomButton from "../custom/CustomButton";
 import { Text } from "react-native-paper";
 import { Formik } from "formik";
 import * as yup from 'yup';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 
 const SignIn = ({ navigation, setToken }: any) => {
     const styles = StyleSheet.create({
@@ -24,6 +24,11 @@ const SignIn = ({ navigation, setToken }: any) => {
             borderBottomColor: 'black',
             borderBottomWidth: StyleSheet.hairlineWidth,
             paddingVertical: 10
+        },
+        errorText: {
+            alignSelf: 'center',
+            paddingBottom: 5,
+            color: error
         }
     });
 
@@ -41,9 +46,29 @@ const SignIn = ({ navigation, setToken }: any) => {
             .required("Password is required"),
     })
 
+    const [errorMessage, setErrorMessage] = useState<string>('')
+
     const handleSigningIn = async (values: any) => {
-        await AsyncStorage.setItem("token", "test")
-        setToken("test")
+        fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/sign_in", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        })
+        .then(response => response.json())
+        .then(async data => {
+            if (data.isSuccess) {
+                setErrorMessage('')
+                await AsyncStorage.setItem("token", data.token)
+                setToken(data.token)
+                navigation.navigate('TournamentList')
+            }
+            else {
+                setErrorMessage(data.message)
+            }
+        })
+        .catch(console.error)
     }
 
     return (
@@ -52,11 +77,12 @@ const SignIn = ({ navigation, setToken }: any) => {
                 ({ handleSubmit }) =>
                     <View style={styles.container}>
                         <Text variant="titleMedium" style={styles.text}>
-                            You haven't siged in yet. Sign in here:
+                            You haven't signed in yet. Sign in here:
                         </Text>
                         <CustomTextInput name="username_or_email" label="Username or Email" inputMode="email" />
                         <CustomTextInput name="password" label="Password" secureTextEntry={true} />
                         <CustomButton buttonText="Sign in" onPress={handleSubmit} />
+                        <Text style={styles.errorText}>{errorMessage}</Text>
                         <View
                             style={styles.horizontalLine}
                         />
