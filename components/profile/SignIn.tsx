@@ -2,7 +2,7 @@ import { StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import { error, primary } from "../../theme/colors";
 import CustomButton from "../custom/CustomButton";
-import { Text } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { Formik } from "formik";
 import * as yup from 'yup';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,11 +19,6 @@ const SignIn = ({ navigation, setToken }: any) => {
             alignSelf: 'center',
             paddingTop: 10,
             paddingBottom: 5
-        },
-        horizontalLine: {
-            borderBottomColor: 'black',
-            borderBottomWidth: StyleSheet.hairlineWidth,
-            paddingVertical: 10
         },
         errorText: {
             alignSelf: 'center',
@@ -83,9 +78,7 @@ const SignIn = ({ navigation, setToken }: any) => {
                         <CustomTextInput name="password" label="Password" secureTextEntry={true} />
                         <CustomButton buttonText="Sign in" onPress={handleSubmit} />
                         <Text style={styles.errorText}>{errorMessage}</Text>
-                        <View
-                            style={styles.horizontalLine}
-                        />
+                        <Divider />
                         <Text variant="titleMedium" style={styles.text}>
                             Don't have an account yet? Create here:
                         </Text>

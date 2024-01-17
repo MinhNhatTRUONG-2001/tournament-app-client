@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import CustomButton from "../custom/CustomButton";
 import { Text } from "react-native-paper";
+import ProfileMenu from "./ProfileMenu";
 
 const Profile = ({ navigation, token, setToken }: any) => {
     const styles = StyleSheet.create({
@@ -19,50 +20,56 @@ const Profile = ({ navigation, token, setToken }: any) => {
         }
     });
 
-    const [username, setUsername] = useState<string | undefined>(undefined)
+    const [userInfo, setUserInfo] = useState<any | undefined>(undefined);
 
-    if (token) {
-        fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/get_username_by_id", {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
+    const getUserInformation = async () => {
+        try {
+            const response = await fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/get_user_information", {
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                }
+            });
+            const data = await response.json();
+
             if (data.isSuccess) {
-                setUsername(data.username)
+                setUserInfo(data);
+            } else {
+                console.log(data.message);
             }
-            else {
-                console.log(data.message)
-            }
-        })
-        .catch(console.error)
-    }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const getToken = async () => {
-        const result = await AsyncStorage.getItem("token")
+        const result = await AsyncStorage.getItem("token");
         if (result !== null) {
-            setToken(result)
+            setToken(result);
         }
-    }
+    };
 
     const handleSigningOut = async () => {
-        await AsyncStorage.removeItem("token")
-        setToken('')
-        setUsername(undefined)
-    }
+        await AsyncStorage.removeItem("token");
+        setToken('');
+        setUserInfo(undefined);
+    };
 
     useEffect(() => {
-        getToken()
-    }, [])
+        getToken();
+
+        if (token) {
+            getUserInformation();
+        }
+    }, [token]);
 
     return (
         <View style={styles.container}>
-            {token && username
+            {token && userInfo
             ? <>
             <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
-            <Text variant="titleLarge"  style={styles.text}>{username}</Text>
-                <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
+            <Text variant="titleLarge"  style={styles.text}>{userInfo.username}</Text>
+            <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo}/>
+            <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
             </>
             : <SignIn navigation={navigation} setToken={setToken} />}
             

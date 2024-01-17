@@ -68,6 +68,7 @@ const SignUp = () => {
                         <Text style={styles.text}>{"\u2022"} At least one lowercase letter (a-z)</Text>
                         <Text style={styles.text}>{"\u2022"} At least one uppercase letter (A-Z)</Text>
                         <Text style={styles.text}>{"\u2022"} At least one special character</Text>
+                        <Text style={styles.text}>* Note: Do not add leading and trailing whitespaces. They will be removed after submitting.</Text>
                         <CustomTextInput name="confirm_password" label="Confirm Password" secureTextEntry={true} />
                         <CustomButton
                             buttonText="Sign up"
