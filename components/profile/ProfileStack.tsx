@@ -7,6 +7,7 @@ import ChangePassword from "./account/ChangePassword";
 import FAQ from "./help_and_about/FAQ";
 import ContactUs from "./help_and_about/ContactUs";
 import About from "./help_and_about/About";
+import ForgotPassword from "./ForgotPassword";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,8 +27,13 @@ const ProfileStack = ({ navigation, token, setToken }: any) => {
             />
             <Stack.Screen
                 name="SignUp"
-                component={SignUp}
+                children={() => <SignUp navigation={navigation} setToken={setToken} />}
                 options={{ title: 'Sign up' }}
+            />
+            <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
+                options={{ title: 'Password reset' }}
             />
             <Stack.Screen
                 name="ChangeUserInfo"

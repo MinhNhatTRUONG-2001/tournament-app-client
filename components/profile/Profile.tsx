@@ -66,13 +66,12 @@ const Profile = ({ navigation, token, setToken }: any) => {
         <View style={styles.container}>
             {token && userInfo
             ? <>
-            <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
-            <Text variant="titleLarge"  style={styles.text}>{userInfo.username}</Text>
-            <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo}/>
-            <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
+                <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
+                <Text variant="titleLarge"  style={styles.text}>{userInfo.username}</Text>
+                <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo}/>
+                <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
             </>
             : <SignIn navigation={navigation} setToken={setToken} />}
-            
         </View>
     )
 }

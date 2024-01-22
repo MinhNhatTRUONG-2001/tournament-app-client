@@ -39,9 +39,11 @@ const ChangeUserInfo = ({ navigation, token }: any) => {
             .required("Username is required")
     })
 
+    const [disabledSubmitButton, setDisabledSubmitButton] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const handleChangingUserInfo = async (values: any) => {
+    const handleChangingUserInfo = async (values: any, { resetForm }: any) => {
+        setDisabledSubmitButton(true)
         const request_body = {
             "username": values["username"],
         }
@@ -59,25 +61,29 @@ const ChangeUserInfo = ({ navigation, token }: any) => {
                 setErrorMessage('')
                 setUserInfoCallback({...userInfo, username: values["username"], can_change_username: false})
                 Alert.alert(data.message)
-                navigation.navigate("Profile")
+                resetForm()
             }
             else {
                 setErrorMessage(data.message)
             }
         })
         .catch(console.error)
+        setDisabledSubmitButton(false)
     }
     
     return (
         <Formik initialValues={initialValues} onSubmit={handleChangingUserInfo} validationSchema={validationSchema}>
             {
-                ({ handleSubmit }) =>
+                ({ handleSubmit, resetForm }) =>
                     <View style={styles.container}>
                         <CustomTextInput name="id" label="User ID" disabled={true}/>
                         <CustomTextInput name="username" label="Username" disabled={!userInfo.can_change_username} />
-                        {!userInfo.can_change_username && <Text style={styles.errorText}>Username cannot be changed within 30 days since last change</Text>}
+                        {!userInfo.can_change_username && <Text style={styles.errorText}>
+                            Username cannot be changed within 30 days since last change.
+                            You can change it again from {userInfo.next_username_change_time}.
+                        </Text>}
                         <CustomTextInput name="email" label="Email" disabled={true} />
-                        <CustomButton buttonText="Change" onPress={handleSubmit} />
+                        <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
                         <Text style={styles.errorText}>{errorMessage}</Text>
                     </View>
             }

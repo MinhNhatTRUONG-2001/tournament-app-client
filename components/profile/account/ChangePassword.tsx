@@ -1,6 +1,6 @@
 import { Alert, StyleSheet, View } from "react-native"
-import { Text } from "react-native-paper"
-import { error, primary } from "../../../theme/colors";
+import { Checkbox, Text } from "react-native-paper"
+import { error, primary, tertiary } from "../../../theme/colors";
 import { Formik } from "formik";
 import CustomTextInput from "../../custom/CustomTextInput";
 import CustomButton from "../../custom/CustomButton";
@@ -25,8 +25,9 @@ const ChangePassword = ({ navigation, token }: any) => {
     });
 
     const initialValues = {
-        'username_or_email': '',
-        'password': ''
+        'current_password': '',
+        'new_password': '',
+        'confirm_new_password': ''
     }
 
     const validationSchema = yup.object().shape({
@@ -47,9 +48,12 @@ const ChangePassword = ({ navigation, token }: any) => {
             .oneOf([yup.ref("new_password")], "Passwords do not match")
     })
 
+    const [showPassword, setShowPassword] = useState<boolean>(false)
+    const [disabledSubmitButton, setDisabledSubmitButton] = useState<boolean>(false)
     const [errorMessage, setErrorMessage] = useState<string>('')
 
-    const handleChangingPassword = async (values: any) => {
+    const handleChangingPassword = async (values: any, { resetForm }: any) => {
+        setDisabledSubmitButton(true)
         const request_body = {
             "current_password": values["current_password"],
             "new_password": values["new_password"]
@@ -67,24 +71,34 @@ const ChangePassword = ({ navigation, token }: any) => {
             if (data.isSuccess) {
                 setErrorMessage('')
                 Alert.alert(data.message)
-                navigation.goBack()
+                resetForm()
             }
             else {
                 setErrorMessage(data.message)
             }
         })
         .catch(console.error)
+        setDisabledSubmitButton(false)
     }
     
     return (
         <Formik initialValues={initialValues} onSubmit={handleChangingPassword} validationSchema={validationSchema}>
             {
-                ({ handleSubmit }) =>
+                ({ handleSubmit, resetForm }) =>
                     <View style={styles.container}>
-                        <CustomTextInput name="current_password" label="Current Password" secureTextEntry={true} />
-                        <CustomTextInput name="new_password" label="New Password" secureTextEntry={true} />
-                        <CustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={true} />
-                        <CustomButton buttonText="Change" onPress={handleSubmit} />
+                        <CustomTextInput name="current_password" label="Current Password" secureTextEntry={!showPassword} />
+                        <CustomTextInput name="new_password" label="New Password" secureTextEntry={!showPassword} />
+                        <CustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={!showPassword} />
+                        <Checkbox.Item
+                            label="Show password"
+                            labelStyle={{ textAlign: 'left' }}
+                            status={showPassword ? 'checked' : 'unchecked'}
+                            onPress={() => {setShowPassword(!showPassword)}}
+                            color={tertiary}
+                            position="leading"
+                            mode="android"
+                        />
+                        <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
                         <Text style={styles.errorText}>{errorMessage}</Text>
                         <Text style={styles.text}>Password requirements:</Text>
                         <Text style={styles.text}>{"\u2022"} 8-64 characters</Text>

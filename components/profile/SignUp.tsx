@@ -1,12 +1,14 @@
 import { Alert, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
-import { primary } from "../../theme/colors";
+import { error, primary, tertiary } from "../../theme/colors";
 import { Formik } from "formik";
 import * as yup from 'yup';
-import { Text } from "react-native-paper";
+import { Checkbox, Text } from "react-native-paper";
+import { useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const SignUp = () => {
+const SignUp = ({ navigation, setToken }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -15,6 +17,11 @@ const SignUp = () => {
         },
         text: {
             marginHorizontal: 5
+        },
+        errorText: {
+            alignSelf: 'center',
+            paddingBottom: 5,
+            color: error
         }
     });
 
@@ -49,9 +56,55 @@ const SignUp = () => {
             .oneOf([yup.ref("password")], "Passwords do not match")
     })
 
+    const [showPassword, setShowPassword] = useState<boolean>(false)
+    const [disabledSubmitButton, setDisabledSubmitButton] = useState<boolean>(false)
+    const [errorMessage, setErrorMessage] = useState<string>('')
+
     const handleSigningUp = (values: any) => {
-        console.log(values)
-        Alert.alert("Clicked!")
+        setDisabledSubmitButton(true)
+        fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/sign_up", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.isSuccess) {
+                    Alert.alert(data.message)
+                    const signInValues = {
+                        "username_or_email": values["email"],
+                        "password": values["password"]
+                    }
+                    fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/sign_in", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(signInValues),
+                    })
+                        .then(response => response.json())
+                        .then(async data => {
+                            if (data.isSuccess) {
+                                setErrorMessage('')
+                                await AsyncStorage.setItem("token", data.token)
+                                setToken(data.token)
+                                navigation.goBack()
+                                navigation.navigate("TournamentList")
+                            }
+                            else {
+                                setErrorMessage(data.message)
+                            }
+                        })
+                        .catch(console.error)
+                }
+                else {
+                    setErrorMessage(data.message)
+                }
+            })
+            .catch(console.error)
+            setDisabledSubmitButton(false)
     }
 
     return (
@@ -61,7 +114,7 @@ const SignUp = () => {
                     <View style={styles.container}>
                         <CustomTextInput name="username" label="Username" />
                         <CustomTextInput name="email" label="Email" inputMode="email" />
-                        <CustomTextInput name="password" label="Password" secureTextEntry={true} />
+                        <CustomTextInput name="password" label="Password" secureTextEntry={!showPassword} />
                         <Text style={styles.text}>Password requirements:</Text>
                         <Text style={styles.text}>{"\u2022"} 8-64 characters</Text>
                         <Text style={styles.text}>{"\u2022"} At least one digit (0-9)</Text>
@@ -69,24 +122,24 @@ const SignUp = () => {
                         <Text style={styles.text}>{"\u2022"} At least one uppercase letter (A-Z)</Text>
                         <Text style={styles.text}>{"\u2022"} At least one special character</Text>
                         <Text style={styles.text}>* Note: Do not add leading and trailing whitespaces. They will be removed after submitting.</Text>
-                        <CustomTextInput name="confirm_password" label="Confirm Password" secureTextEntry={true} />
-                        <CustomButton
-                            buttonText="Sign up"
-                            onPress={handleSubmit}
+                        <CustomTextInput name="confirm_password" label="Confirm Password" secureTextEntry={!showPassword} />
+                        <Checkbox.Item
+                            label="Show password"
+                            labelStyle={{ textAlign: 'left' }}
+                            status={showPassword ? 'checked' : 'unchecked'}
+                            onPress={() => {setShowPassword(!showPassword)}}
+                            color={tertiary}
+                            position="leading"
+                            mode="android"
                         />
+                        <CustomButton buttonText="Sign up" onPress={handleSubmit} disabled={disabledSubmitButton}/>
+                        <Text style={styles.errorText}>{errorMessage}</Text>
                     </View>
             }
         </Formik>
     )
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});
-
 export default SignUp
+
+//Add show password button at SignIn, SignUp, ChangePassword
