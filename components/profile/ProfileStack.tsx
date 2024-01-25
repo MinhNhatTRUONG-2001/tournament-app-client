@@ -37,12 +37,12 @@ const ProfileStack = ({ navigation, token, setToken }: any) => {
             />
             <Stack.Screen
                 name="ChangeUserInfo"
-                children={() => <ChangeUserInfo navigation={navigation} token={token} />}
+                children={() => <ChangeUserInfo token={token} />}
                 options={{ title: 'Change user information' }}
             />
             <Stack.Screen
                 name="ChangePassword"
-                children={() => <ChangePassword navigation={navigation} token={token} />}
+                children={() => <ChangePassword token={token} />}
                 options={{ title: 'Change password' }}
             />
             <Stack.Screen

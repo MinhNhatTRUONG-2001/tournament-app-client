@@ -7,7 +7,7 @@ import CustomButton from "../../custom/CustomButton";
 import * as yup from 'yup';
 import { useState } from "react";
 
-const ChangePassword = ({ navigation, token }: any) => {
+const ChangePassword = ({ token }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
