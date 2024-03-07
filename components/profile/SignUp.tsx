@@ -141,5 +141,3 @@ const SignUp = ({ navigation, setToken }: any) => {
 }
 
 export default SignUp
-
-//Add show password button at SignIn, SignUp, ChangePassword

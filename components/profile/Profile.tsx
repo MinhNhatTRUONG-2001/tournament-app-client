@@ -56,7 +56,6 @@ const Profile = ({ navigation, token, setToken }: any) => {
 
     useEffect(() => {
         getToken();
-
         if (token) {
             getUserInformation();
         }

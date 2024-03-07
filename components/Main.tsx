@@ -22,7 +22,7 @@ const Main = () => {
                         backgroundColor: secondary
                     },
                     tabBarIcon: ({ color, size }) => {
-                        if (route.name === 'Tournaments') {
+                        if (route.name === 'TournamentStack') {
                             return (
                                 <Ionicons
                                     name="trophy"
@@ -43,7 +43,11 @@ const Main = () => {
                     tabBarActiveTintColor: tertiary,
                 })}
             >
-                <BottomTab.Screen name="Tournaments" component={TournamentStack} />
+                <BottomTab.Screen
+                    name="TournamentStack"
+                    children={() => <TournamentStack navigation={navigation} token={token} />}
+                    options={{ title: 'Tournaments' }}
+                />
                 <BottomTab.Screen
                     name="ProfileStack"
                     children={() => <ProfileStack navigation={navigation} token={token} setToken={setToken} />}
