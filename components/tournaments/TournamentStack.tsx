@@ -4,6 +4,9 @@ import { secondary, tertiary } from "../../theme/colors";
 import TournamentDetails from "./TournamentDetails";
 import NewTournament from "./NewTournament";
 import EditTournament from "./EditTournament";
+import EditStage from "../stages/EditStage";
+import NewStage from "../stages/NewStage";
+import StageDetails from "../stages/StageDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +46,27 @@ const TournamentStack = ({ navigation, token }: any) => {
             component={TournamentDetails}
             options={{
                 title: 'Tournament Details',
+            }}
+        />
+        <Stack.Screen
+            name="NewStage"
+            component={NewStage}
+            options={{
+                title: 'New Stage',
+            }}
+        />
+        <Stack.Screen
+            name="EditStage"
+            component={EditStage}
+            options={{
+                title: 'Edit Stage',
+            }}
+        />
+        <Stack.Screen
+            name="StageDetails"
+            component={StageDetails}
+            options={{
+                title: 'Stage Details',
             }}
         />
     </Stack.Navigator>

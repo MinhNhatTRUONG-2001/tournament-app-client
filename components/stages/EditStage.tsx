@@ -9,7 +9,7 @@ import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 
-const NewTournament = ({ route, navigation }: any) => {
+const EditStage = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -33,18 +33,21 @@ const NewTournament = ({ route, navigation }: any) => {
         }
     });
 
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const { token } = route.params;
+    const { stageList } = route.params;
+    const { setStageList } = route.params;
+    const { stageInfo } = route.params;
+    const { setStageInfo } = route.params;
+    const [startDate, setStartDate] = useState(new Date(stageInfo.start_date));
+    const [endDate, setEndDate] = useState(new Date(stageInfo.end_date));
     const [errorMessage, setErrorMessage] = useState<string>('')
-    const { token } = route.params
-    const { tournamentList } = route.params
-    const { setTournamentList } = route.params
 
     const initialValues = {
-        'name': 'New tournament',
+        'name': stageInfo.name,
         'start_date': startDate.toISOString(),
         'end_date': endDate.toISOString(),
-        'places': ['']
+        'places': stageInfo.places,
+        'description': stageInfo.description
     }
 
     const validationSchema = yup.object().shape({
@@ -70,6 +73,8 @@ const NewTournament = ({ route, navigation }: any) => {
         places: yup
             .array()
             .of(yup.string()),
+        description: yup
+            .string()
     })
 
     const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
@@ -86,25 +91,25 @@ const NewTournament = ({ route, navigation }: any) => {
         }
     };
 
-    const createTournament = (values: any) => {
+    const updateStage = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${token}`, {
-            method: 'POST',
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}/${token}`, {
+            method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
         })
         .then(response => response.json())
-        .then((data: any) => {
-            setTournamentList([...tournamentList, data])
-            navigation.navigate('TournamentList')
+        .then(data => {
+            setStageList(stageList.map((s: any) => s.id === stageInfo.id ? data : s))
+            setStageInfo(data)
+            navigation.goBack()
         })
-        .catch(console.error)
     }
 
     return (
-        <Formik initialValues={initialValues} onSubmit={createTournament} validationSchema={validationSchema}>
+        <Formik initialValues={initialValues} onSubmit={updateStage} validationSchema={validationSchema}>
             {
                 ({ handleSubmit, values, handleChange }) =>
                     <View style={styles.container}>
@@ -127,7 +132,7 @@ const NewTournament = ({ route, navigation }: any) => {
                         <FieldArray name="places">
                             {({ push, remove }) => (
                                 <>
-                                    {values.places.map((item, index) => (
+                                    {values.places.map((item: string, index: number) => (
                                         <View style={styles.container2} key={index}>
                                             <TextInput
                                                 onChangeText={handleChange(`places.${index}`)}
@@ -141,7 +146,7 @@ const NewTournament = ({ route, navigation }: any) => {
                                 </>
                             )}
                         </FieldArray>
-                        <CustomButton buttonText="Create tournament" onPress={handleSubmit} />
+                        <CustomButton buttonText="Update" onPress={handleSubmit} />
                         <Text style={styles.errorText}>{errorMessage}</Text>
                     </View>
             }
@@ -149,4 +154,4 @@ const NewTournament = ({ route, navigation }: any) => {
     )
 }
 
-export default NewTournament
+export default EditStage

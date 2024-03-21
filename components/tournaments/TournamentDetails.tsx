@@ -3,7 +3,7 @@ import { primary } from "../../theme/colors";
 import { Divider } from "react-native-paper";
 import { useEffect, useState } from "react";
 import TournamentInfo from "./TournamentInfo";
-import StageList from "./StageList";
+import StageList from "../stages/StageList";
 
 const TournamentDetails = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -42,7 +42,10 @@ const TournamentDetails = ({ route, navigation }: any) => {
                 tournamentInfo={tournamentInfo}
                 setTournamentInfo={setTournamentInfo}/>
             <Divider />
-            <StageList navigation={navigation} token={token} />
+            <StageList
+                navigation={navigation}
+                token={token}
+                tournamentId={id} />
         </View>
     )
 }

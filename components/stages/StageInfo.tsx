@@ -3,7 +3,7 @@ import { error, primary } from "../../theme/colors";
 import { List } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 
-const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo }: any) => {
+const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setStageInfo }: any) => {
     const styles = StyleSheet.create({
         container: {
             backgroundColor: primary,
@@ -15,19 +15,19 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
         }
     });
 
-    var displayedTournamentInfo = { ...tournamentInfo }
-    delete displayedTournamentInfo["id"]
-    delete displayedTournamentInfo["user_id"]
+    var displayedStageInfo = { ...stageInfo }
+    delete displayedStageInfo["id"]
+    //delete displayedStageInfo["user_id"]
 
-    const deleteTournament = () => {
+    const deleteStage = () => {
         Alert.prompt(
             "Confirm deletion",
-            `Delete this tournament will delete all stages and matches connected to it. Type "${tournamentInfo.name}" to confirm.`,
+            `Do you want to delete this stage and connected matches? Type "${stageInfo.name}" to confirm.`,
             (input: string) => {
-                if (input === tournamentInfo.name) {
-                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}/${token}`, { method: 'DELETE' })
+                if (input === stageInfo.name) {
+                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}/${token}`, { method: 'DELETE' })
                     .then(() => {
-                        setTournamentList(tournamentList.filter((t: any) => t.id !== tournamentInfo.id))
+                        setStageList(stageList.filter((t: any) => t.id !== stageInfo.id))
                         navigation.goBack()
                     })
                 }
@@ -41,7 +41,7 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
         <View style={styles.container}>
             <List.Section>
                 {
-                    Object.entries(displayedTournamentInfo).map(([key, value]) => 
+                    Object.entries(displayedStageInfo).map(([key, value]) => 
                         <List.Item
                             key={key}
                             title={key}
@@ -51,10 +51,10 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
                     )
                 }
             </List.Section>
-            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
-            <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
+            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditStage", { navigation, token, stageList, setStageList, stageInfo, setStageInfo })} />
+            <CustomButton buttonText="Delete" onPress={deleteStage} buttonColor={error} />
         </View>
     )
 }
 
-export default TournamentInfo
+export default StageInfo

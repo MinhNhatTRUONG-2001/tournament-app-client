@@ -68,7 +68,10 @@ const EditTournament = ({ route, navigation }: any) => {
                 return isBeforeEndDate
             }),
         end_date: yup
-            .date()
+            .date(),
+        places: yup
+            .array()
+            .of(yup.string()),
     })
 
     const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
