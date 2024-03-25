@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from "react-native";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import { error, primary } from "../../theme/colors";
 import CustomButton from "../custom/CustomButton";
@@ -70,12 +70,14 @@ const ForgotPassword = () => {
             {
                 ({ handleSubmit, resetForm }) =>
                     <View style={styles.container}>
-                        <Text variant="titleMedium" style={styles.text}>
-                            Enter your registered email address to send a request for the password reset
-                        </Text>
-                        <CustomTextInput name="email" label="Email" inputMode="email" />
-                        <CustomButton buttonText="Reset password" onPress={handleSubmit} disabled={disabledSubmitButton} />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
+                        <ScrollView>
+                            <Text variant="titleMedium" style={styles.text}>
+                                Enter your registered email address to send a request for the password reset
+                            </Text>
+                            <CustomTextInput name="email" label="Email" inputMode="email" />
+                            <CustomButton buttonText="Reset password" onPress={handleSubmit} disabled={disabledSubmitButton} />
+                            <Text style={styles.errorText}>{errorMessage}</Text>
+                        </ScrollView>
                     </View>
             }
         </Formik>

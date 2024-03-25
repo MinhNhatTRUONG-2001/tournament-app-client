@@ -99,32 +99,34 @@ const ChangeUserInfo = ({ token }: any) => {
             {
                 ({ handleSubmit, values }) =>
                     <View style={styles.container}>
-                        <CustomTextInput name="id" label="User ID" disabled={true}/>
-                        <CustomTextInput name="username" label="Username" disabled={!userInfo.can_change_username} />
-                        {!userInfo.can_change_username && <Text style={styles.errorText}>
-                            Username cannot be changed within 30 days since last change.
-                            You can change it again from {userInfo.next_username_change_time}.
-                        </Text>}
-                        <CustomTextInput name="email" label="Email" disabled={true} />
-                        <Menu
-                            visible={showCountriesMenu}
-                            onDismiss={() => setShowCountriesMenu(false)}
-                            anchor={<CustomTextInput name="country" label="Country" editable={false} onPressIn={() => setShowCountriesMenu(true)}/>}
-                        >
-                            <ScrollView>
-                                {countryNames.map(cn => <Menu.Item 
-                                    onPress={() => {
-                                        values["country"] = cn
-                                        setShowCountriesMenu(false)
-                                    }}
-                                    title={cn}
-                                />)}
-                            </ScrollView>
-                        </Menu>
-                        <Text style={styles.text}>Dial code: {countries.find(c => c["name"] === values["country"]) ? countries.find(c => c["name"] === values["country"])["dial_code"] : ''}</Text>
-                        <CustomTextInput name="phone" label="Phone (no leading zero)" inputMode="tel" />
-                        <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
+                        <ScrollView>
+                            <CustomTextInput name="id" label="User ID" disabled={true}/>
+                            <CustomTextInput name="username" label="Username" disabled={!userInfo.can_change_username} />
+                            {!userInfo.can_change_username && <Text style={styles.errorText}>
+                                Username cannot be changed within 30 days since last change.
+                                You can change it again from {userInfo.next_username_change_time}.
+                            </Text>}
+                            <CustomTextInput name="email" label="Email" disabled={true} />
+                            <Menu
+                                visible={showCountriesMenu}
+                                onDismiss={() => setShowCountriesMenu(false)}
+                                anchor={<CustomTextInput name="country" label="Country" editable={false} onPressIn={() => setShowCountriesMenu(true)}/>}
+                            >
+                                <ScrollView>
+                                    {countryNames.map(cn => <Menu.Item 
+                                        onPress={() => {
+                                            values["country"] = cn
+                                            setShowCountriesMenu(false)
+                                        }}
+                                        title={cn}
+                                    />)}
+                                </ScrollView>
+                            </Menu>
+                            <Text style={styles.text}>Dial code: {countries.find(c => c["name"] === values["country"]) ? countries.find(c => c["name"] === values["country"])["dial_code"] : ''}</Text>
+                            <CustomTextInput name="phone" label="Phone (no leading zero)" inputMode="tel" />
+                            <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
+                            <Text style={styles.errorText}>{errorMessage}</Text>
+                        </ScrollView>
                     </View>
             }
         </Formik>

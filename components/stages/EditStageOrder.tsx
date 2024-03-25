@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
@@ -33,7 +33,7 @@ const EditStageOrder = ({ route, navigation }: any) => {
     const { stageList } = route.params
     const { setStageList } = route.params
     var temporaryStageList: any[] = stageList
-    const [errorMessage, setErrorMessage] = useState<string>('')
+    const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
 
     const handleInputChange = (event: any) => {
         temporaryStageList[event.target.name].stage_order = event.target.value
@@ -56,22 +56,26 @@ const EditStageOrder = ({ route, navigation }: any) => {
             setStageList(temporaryStageList)
             navigation.goBack()
         })
-        .catch(console.error)
+        .catch((error: any) => {
+            setServerErrorMessage(error.message)
+        })
     }
 
     return (
         <View style={styles.container}>
-            {temporaryStageList.map((stage, index) => 
-                <View style={styles.container2}>
-                    <CustomTextInput
-                        name={index}
-                        inputMode="numeric"
-                        onChangeText={handleInputChange}/>
-                    <Text>{stage.name}</Text>
-                </View>
-            )}
-            <CustomButton buttonText="Update" onPress={updateStageOrder} />
-            <Text style={styles.errorText}>{errorMessage}</Text>
+            <ScrollView>
+                {temporaryStageList.map((stage, index) => 
+                    <View style={styles.container2}>
+                        <CustomTextInput
+                            name={index}
+                            inputMode="numeric"
+                            onChangeText={handleInputChange}/>
+                        <Text>{stage.name}</Text>
+                    </View>
+                )}
+                <CustomButton buttonText="Update" onPress={updateStageOrder} />
+                <Text style={styles.errorText}>{serverErrorMessage}</Text>
+            </ScrollView>
         </View>
     )
 }

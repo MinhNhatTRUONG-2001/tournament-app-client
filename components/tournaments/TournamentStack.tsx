@@ -7,6 +7,7 @@ import EditTournament from "./EditTournament";
 import EditStage from "../stages/EditStage";
 import NewStage from "../stages/NewStage";
 import StageDetails from "../stages/StageDetails";
+import EditStageOrder from "../stages/EditStageOrder";
 
 const Stack = createNativeStackNavigator();
 
@@ -67,6 +68,13 @@ const TournamentStack = ({ navigation, token }: any) => {
             component={StageDetails}
             options={{
                 title: 'Stage Details',
+            }}
+        />
+        <Stack.Screen
+            name="EditStageOrder"
+            component={EditStageOrder}
+            options={{
+                title: 'Edit Stage Order',
             }}
         />
     </Stack.Navigator>

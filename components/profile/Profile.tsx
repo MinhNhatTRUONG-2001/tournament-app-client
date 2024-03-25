@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { primary } from "../../theme/colors";
 import SignIn from "./SignIn";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -64,13 +64,15 @@ const Profile = ({ navigation, token, setToken }: any) => {
     return (
         <View style={styles.container}>
             {token && userInfo
-            ? <>
+            ? <ScrollView>
                 <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
                 <Text variant="titleLarge"  style={styles.text}>{userInfo.username}</Text>
                 <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo}/>
                 <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
-            </>
-            : <SignIn navigation={navigation} setToken={setToken} />}
+            </ScrollView>
+            : <ScrollView>
+                <SignIn navigation={navigation} setToken={setToken} />
+            </ScrollView>}
         </View>
     )
 }

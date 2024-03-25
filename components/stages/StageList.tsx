@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { primary, tertiary } from "../../theme/colors";
 import { List, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
@@ -51,11 +51,13 @@ const StageList = ({ navigation, token, tournamentId }: any) => {
                 <>
                     {stageList ?
                     <>
-                        <CustomButton
-                            buttonText="Change stage order"
-                            icon="menu"
-                            onPress={() => navigation.navigate("EditStageOrder", { navigation, token, tournamentId, stageList, setStageList })}
-                        />
+                        {stageList.length > 1 &&
+                            <CustomButton
+                                buttonText="Change stage order"
+                                icon="menu"
+                                onPress={() => navigation.navigate("EditStageOrder", { navigation, token, tournamentId, stageList, setStageList })}
+                            />
+                        }
                         <List.Section>
                             {stageList.map((s: any) => {
                                 const stageFormat = stageFormats?.find(sf => sf.id === s.format_id)["name"]

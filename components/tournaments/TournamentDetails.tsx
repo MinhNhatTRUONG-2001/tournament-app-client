@@ -1,6 +1,6 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { primary } from "../../theme/colors";
-import { Divider } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
 import TournamentInfo from "./TournamentInfo";
 import StageList from "../stages/StageList";
@@ -15,6 +15,10 @@ const TournamentDetails = ({ route, navigation }: any) => {
         item: {
             padding: 5,
             margin: 5
+        },
+        text: {
+            alignSelf: 'center',
+            paddingTop: 10
         }
     });
 
@@ -34,18 +38,22 @@ const TournamentDetails = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <TournamentInfo
-                navigation={navigation}
-                token={token}
-                tournamentList={tournamentList}
-                setTournamentList={setTournamentList}
-                tournamentInfo={tournamentInfo}
-                setTournamentInfo={setTournamentInfo}/>
-            <Divider />
-            <StageList
-                navigation={navigation}
-                token={token}
-                tournamentId={id} />
+            <ScrollView>
+                <TournamentInfo
+                    navigation={navigation}
+                    token={token}
+                    tournamentList={tournamentList}
+                    setTournamentList={setTournamentList}
+                    tournamentInfo={tournamentInfo}
+                    setTournamentInfo={setTournamentInfo}/>
+                <Divider />
+                <Text variant="titleMedium" style={styles.text}>Stage list</Text>
+                <StageList
+                    navigation={navigation}
+                    token={token}
+                    tournamentId={id}
+                />
+            </ScrollView>
         </View>
     )
 }

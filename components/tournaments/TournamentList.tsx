@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { primary, tertiary } from "../../theme/colors";
 import { List, Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
@@ -40,36 +40,38 @@ const TournamentList = ({ navigation, token }: any) => {
 
     return (
         <View style={styles.container}>
-            {token ? (
-                tournamentList ? (
-                    <>
-                        <List.Section>
-                            {tournamentList.map((t: any) => (
-                                <List.Item
-                                    key={t.id}
-                                    title={t.name}
-                                    right={() => <List.Icon icon="chevron-right" />}
-                                    onPress={() => navigation.navigate("TournamentDetails", { navigation, token, id: t.id, tournamentList, setTournamentList })}
-                                    style={styles.item}
-                                />
-                            ))}
-                        </List.Section>
-                        <CustomButton
-                            buttonText="New tournament"
-                            icon="plus"
-                            onPress={() => navigation.navigate("NewTournament", { navigation, token, tournamentList, setTournamentList })}
-                        />
-                    </>
+            <ScrollView>
+                {token ? (
+                    tournamentList ? (
+                        <>
+                            <List.Section>
+                                {tournamentList.map((t: any) => (
+                                    <List.Item
+                                        key={t.id}
+                                        title={t.name}
+                                        right={() => <List.Icon icon="chevron-right" />}
+                                        onPress={() => navigation.navigate("TournamentDetails", { navigation, token, id: t.id, tournamentList, setTournamentList })}
+                                        style={styles.item}
+                                    />
+                                ))}
+                            </List.Section>
+                            <CustomButton
+                                buttonText="New tournament"
+                                icon="plus"
+                                onPress={() => navigation.navigate("NewTournament", { navigation, token, tournamentList, setTournamentList })}
+                            />
+                        </>
+                    ) : (
+                        <View style={styles.container2}>
+                            <Text>Loading...</Text>
+                        </View>
+                    )
                 ) : (
                     <View style={styles.container2}>
-                        <Text>Loading...</Text>
+                        <Text>Please sign in to see your tournament list.</Text>
                     </View>
-                )
-            ) : (
-                <View style={styles.container2}>
-                    <Text>Please sign in to see your tournament list.</Text>
-                </View>
-            )}
+                )}             
+            </ScrollView>
         </View>
     )
 }

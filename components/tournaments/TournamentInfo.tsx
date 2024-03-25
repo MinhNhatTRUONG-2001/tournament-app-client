@@ -1,7 +1,8 @@
 import { Alert, StyleSheet, View } from "react-native";
 import { error, primary } from "../../theme/colors";
-import { List } from "react-native-paper";
+import { List, Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
+import { useState } from "react";
 
 const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo }: any) => {
     const styles = StyleSheet.create({
@@ -10,11 +11,16 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
             justifyContent: 'flex-start',
         },
         item: {
-            padding: 5,
-            margin: 5
+            marginHorizontal: 5
+        },
+        errorText: {
+            alignSelf: 'center',
+            paddingBottom: 5,
+            color: error
         }
     });
 
+    const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
     var displayedTournamentInfo = { ...tournamentInfo }
     delete displayedTournamentInfo["id"]
     delete displayedTournamentInfo["user_id"]
@@ -29,6 +35,9 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
                     .then(() => {
                         setTournamentList(tournamentList.filter((t: any) => t.id !== tournamentInfo.id))
                         navigation.goBack()
+                    })
+                    .catch((error: any) => {
+                        setServerErrorMessage(error.message)
                     })
                 }
                 else {
@@ -53,6 +62,7 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
             </List.Section>
             <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
             <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
+            <Text style={styles.errorText}>{serverErrorMessage}</Text>
         </View>
     )
 }

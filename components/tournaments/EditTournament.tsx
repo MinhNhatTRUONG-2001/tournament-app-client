@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary } from "../../theme/colors";
@@ -30,23 +30,30 @@ const EditTournament = ({ route, navigation }: any) => {
         },
         datePicker: {
             alignItems: 'center'
+        },
+        multilineTextInput: {
+            minHeight: 150,
+            textAlignVertical: 'top',
+            marginHorizontal: 5,
+            marginBottom: 10
         }
     });
 
-    const { token } = route.params;
-    const { tournamentList } = route.params;
-    const { setTournamentList } = route.params;
-    const { tournamentInfo } = route.params;
-    const { setTournamentInfo } = route.params;
-    const [startDate, setStartDate] = useState(new Date(tournamentInfo.start_date));
-    const [endDate, setEndDate] = useState(new Date(tournamentInfo.end_date));
-    const [errorMessage, setErrorMessage] = useState<string>('')
+    const { token } = route.params
+    const { tournamentList } = route.params
+    const { setTournamentList } = route.params
+    const { tournamentInfo } = route.params
+    const { setTournamentInfo } = route.params
+    const [startDate, setStartDate] = useState(new Date(tournamentInfo.start_date))
+    const [endDate, setEndDate] = useState(new Date(tournamentInfo.end_date))
+    const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
 
     const initialValues = {
         'name': tournamentInfo.name,
         'start_date': startDate.toISOString(),
         'end_date': endDate.toISOString(),
-        'places': tournamentInfo.places
+        'places': tournamentInfo.places,
+        'description': tournamentInfo.description
     }
 
     const validationSchema = yup.object().shape({
@@ -59,12 +66,6 @@ const EditTournament = ({ route, navigation }: any) => {
             .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
                 const { end_date } = this.parent
                 const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
-                if (!isBeforeEndDate) {
-                    setErrorMessage('Start date must be before or equal to end date')
-                }
-                else {
-                    setErrorMessage('')
-                }
                 return isBeforeEndDate
             }),
         end_date: yup
@@ -72,6 +73,8 @@ const EditTournament = ({ route, navigation }: any) => {
         places: yup
             .array()
             .of(yup.string()),
+        description: yup
+            .string()
     })
 
     const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
@@ -103,48 +106,60 @@ const EditTournament = ({ route, navigation }: any) => {
             setTournamentInfo(data)
             navigation.goBack()
         })
+        .catch((error: any) => {
+            setServerErrorMessage(error.message)
+        })
     }
 
     return (
         <Formik initialValues={initialValues} onSubmit={updateTournament} validationSchema={validationSchema}>
             {
-                ({ handleSubmit, values, handleChange }) =>
+                ({ handleSubmit, values, handleChange, errors }) =>
                     <View style={styles.container}>
-                        <CustomTextInput name="name" label="Name" />
-                        <Text style={styles.text}>Start date</Text>
-                        <View style={styles.datePicker}>
-                            <RNDateTimePicker
-                                value={startDate}
-                                onChange={(event, date) => changeStartDate(event, date, values)}
+                        <ScrollView>
+                            <CustomTextInput name="name" label="Name" />
+                            <Text style={styles.text}>Start date</Text>
+                            <View style={styles.datePicker}>
+                                <RNDateTimePicker
+                                    value={startDate}
+                                    onChange={(event, date) => changeStartDate(event, date, values)}
+                                />
+                            </View>
+                            <Text style={styles.text}>End date</Text>
+                            <View style={styles.datePicker}>
+                                <RNDateTimePicker
+                                    value={endDate}
+                                    onChange={(event, date) => changeEndDate(event, date, values)}
+                                />
+                            </View>
+                            {(errors && errors.start_date) && <Text style={styles.errorText}>{errors.start_date}</Text>}
+                            <Text style={styles.text}>Places</Text>
+                            <FieldArray name="places">
+                                {({ push, remove }) => (
+                                    <>
+                                        {values.places.map((item: string, index: number) => (
+                                            <View style={styles.container2} key={index}>
+                                                <TextInput
+                                                    onChangeText={handleChange(`places.${index}`)}
+                                                    value={item}
+                                                    placeholder="Place"
+                                                />
+                                                <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
+                                            </View>
+                                        ))}
+                                        <CustomButton buttonText="Add Places" onPress={() => push('')} buttonColor={secondary} />
+                                    </>
+                                )}
+                            </FieldArray>
+                            <CustomTextInput
+                                style={styles.multilineTextInput}
+                                name="description"
+                                label="Description"
+                                multiline={true}
                             />
-                        </View>
-                        <Text style={styles.text}>End date</Text>
-                        <View style={styles.datePicker}>
-                            <RNDateTimePicker
-                                value={endDate}
-                                onChange={(event, date) => changeEndDate(event, date, values)}
-                            />
-                        </View>
-                        <Text style={styles.text}>Places</Text>
-                        <FieldArray name="places">
-                            {({ push, remove }) => (
-                                <>
-                                    {values.places.map((item: string, index: number) => (
-                                        <View style={styles.container2} key={index}>
-                                            <TextInput
-                                                onChangeText={handleChange(`places.${index}`)}
-                                                value={item}
-                                                placeholder="Place"
-                                            />
-                                            <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
-                                        </View>
-                                    ))}
-                                    <CustomButton buttonText="Add Places" onPress={() => push('')} buttonColor={secondary} />
-                                </>
-                            )}
-                        </FieldArray>
-                        <CustomButton buttonText="Update" onPress={handleSubmit} />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
+                            <CustomButton buttonText="Update" onPress={handleSubmit} />
+                            <Text style={styles.errorText}>{serverErrorMessage}</Text>
+                        </ScrollView>
                     </View>
             }
         </Formik>

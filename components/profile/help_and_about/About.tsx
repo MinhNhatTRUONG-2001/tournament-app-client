@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native"
+import { ScrollView, StyleSheet, View } from "react-native"
 import { Text } from "react-native-paper"
 import { primary } from "../../../theme/colors";
 
@@ -12,7 +12,9 @@ const About = () => {
     });
     
     return <View style={styles.container}>
-        <Text>About</Text>
+        <ScrollView>
+            <Text>About</Text>
+        </ScrollView>
     </View>
 }
 

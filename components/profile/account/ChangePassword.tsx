@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View } from "react-native"
+import { Alert, ScrollView, StyleSheet, View } from "react-native"
 import { Checkbox, Text } from "react-native-paper"
 import { error, primary, tertiary } from "../../../theme/colors";
 import { Formik } from "formik";
@@ -86,27 +86,29 @@ const ChangePassword = ({ token }: any) => {
             {
                 ({ handleSubmit, resetForm }) =>
                     <View style={styles.container}>
-                        <CustomTextInput name="current_password" label="Current Password" secureTextEntry={!showPassword} />
-                        <CustomTextInput name="new_password" label="New Password" secureTextEntry={!showPassword} />
-                        <CustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={!showPassword} />
-                        <Checkbox.Item
-                            label="Show password"
-                            labelStyle={{ textAlign: 'left' }}
-                            status={showPassword ? 'checked' : 'unchecked'}
-                            onPress={() => {setShowPassword(!showPassword)}}
-                            color={tertiary}
-                            position="leading"
-                            mode="android"
-                        />
-                        <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
-                        <Text style={styles.text}>Password requirements:</Text>
-                        <Text style={styles.text}>{"\u2022"} 8-64 characters</Text>
-                        <Text style={styles.text}>{"\u2022"} At least one digit (0-9)</Text>
-                        <Text style={styles.text}>{"\u2022"} At least one lowercase letter (a-z)</Text>
-                        <Text style={styles.text}>{"\u2022"} At least one uppercase letter (A-Z)</Text>
-                        <Text style={styles.text}>{"\u2022"} At least one special character</Text>
-                        <Text style={styles.text}>* Note: Do not add leading and trailing whitespaces. They will be removed after submitting.</Text>
+                        <ScrollView>
+                            <CustomTextInput name="current_password" label="Current Password" secureTextEntry={!showPassword} />
+                            <CustomTextInput name="new_password" label="New Password" secureTextEntry={!showPassword} />
+                            <CustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={!showPassword} />
+                            <Checkbox.Item
+                                label="Show password"
+                                labelStyle={{ textAlign: 'left' }}
+                                status={showPassword ? 'checked' : 'unchecked'}
+                                onPress={() => {setShowPassword(!showPassword)}}
+                                color={tertiary}
+                                position="leading"
+                                mode="android"
+                            />
+                            <CustomButton buttonText="Change" onPress={handleSubmit} disabled={disabledSubmitButton} />
+                            <Text style={styles.errorText}>{errorMessage}</Text>
+                            <Text style={styles.text}>Password requirements:</Text>
+                            <Text style={styles.text}>{"\u2022"} 8-64 characters</Text>
+                            <Text style={styles.text}>{"\u2022"} At least one digit (0-9)</Text>
+                            <Text style={styles.text}>{"\u2022"} At least one lowercase letter (a-z)</Text>
+                            <Text style={styles.text}>{"\u2022"} At least one uppercase letter (A-Z)</Text>
+                            <Text style={styles.text}>{"\u2022"} At least one special character</Text>
+                            <Text style={styles.text}>* Note: Do not add leading and trailing whitespaces. They will be removed after submitting.</Text>
+                        </ScrollView>
                     </View>
             }
         </Formik>

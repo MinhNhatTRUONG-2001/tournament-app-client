@@ -1,8 +1,9 @@
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { primary } from "../../theme/colors";
 import { Divider } from "react-native-paper";
 import { useEffect, useState } from "react";
 import StageInfo from "./StageInfo";
+import MatchesSe from "../profile/matches_se/MatchesSe";
 
 const StageDetails = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -33,14 +34,25 @@ const StageDetails = ({ route, navigation }: any) => {
 
     return (
         <View style={styles.container}>
-            <StageInfo
-                navigation={navigation}
-                token={token}
-                stageList={stageList}
-                setStageList={setStageList}
-                tournamentInfo={stageInfo}
-                setTournamentInfo={setStageInfo}/>
-            <Divider />
+            {stageInfo &&
+                <ScrollView> 
+                    <StageInfo
+                        navigation={navigation}
+                        token={token}
+                        stageList={stageList}
+                        setStageList={setStageList}
+                        stageInfo={stageInfo}
+                        setStageInfo={setStageInfo}/>
+                    <Divider />
+                    {stageInfo.format_id === 1 &&
+                        <MatchesSe
+                            navigation={navigation}
+                            token={token}
+                            stageId={stageId}
+                        />
+                    }
+                </ScrollView>
+            }
         </View>
     )
 }
