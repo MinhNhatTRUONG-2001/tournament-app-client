@@ -50,14 +50,21 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
         <View style={styles.container}>
             <List.Section>
                 {
-                    Object.entries(displayedTournamentInfo).map(([key, value]) => 
-                        <List.Item
+                    Object.entries(displayedTournamentInfo).map(([key, value]: any) => {
+                        var displayedValue: string = '' 
+                        if (value.constructor === Array) {
+                            displayedValue = value.length > 0 ? value.join('; ') : 'N/A'
+                        }
+                        else {
+                            displayedValue = value ? value as string : 'N/A'
+                        }
+                        return <List.Item
                             key={key}
                             title={key}
-                            description={value as string}
+                            description={displayedValue}
                             style={styles.item}
                         />
-                    )
+                    })
                 }
             </List.Section>
             <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />

@@ -59,14 +59,21 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
         <View style={styles.container}>
             <List.Section>
                 {
-                    Object.entries(displayedStageInfo).map(([key, value]) => 
-                        <List.Item
+                    Object.entries(displayedStageInfo).map(([key, value]: any) => {
+                        var displayedValue: string = '' 
+                        if (value.constructor === Array) {
+                            displayedValue = value.length > 0 ? value.join('; ') : 'N/A'
+                        }
+                        else {
+                            displayedValue = value ? value as string : 'N/A'
+                        }
+                        return <List.Item
                             key={key}
                             title={key}
-                            description={value ? value as string : 'N/A'}
+                            description={displayedValue}
                             style={styles.item}
                         />
-                    )
+                    })
                 }
             </List.Section>
             <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditStage", { navigation, token, stageList, setStageList, stageInfo, setStageInfo })} />

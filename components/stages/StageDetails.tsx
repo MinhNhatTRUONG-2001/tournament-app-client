@@ -3,7 +3,7 @@ import { primary } from "../../theme/colors";
 import { Divider } from "react-native-paper";
 import { useEffect, useState } from "react";
 import StageInfo from "./StageInfo";
-import MatchesSe from "../profile/matches_se/MatchesSe";
+import MatchesSe from "../matches_se/MatchesSe";
 
 const StageDetails = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -49,6 +49,7 @@ const StageDetails = ({ route, navigation }: any) => {
                             navigation={navigation}
                             token={token}
                             stageId={stageId}
+                            includeThirdPlaceMatch={stageInfo.include_third_place_match}
                         />
                     }
                 </ScrollView>

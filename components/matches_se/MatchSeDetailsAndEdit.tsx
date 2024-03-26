@@ -9,8 +9,8 @@ import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 
-const EditStage = ({ route, navigation }: any) => {
-    const styles = StyleSheet.create({
+const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
+    /* const styles = StyleSheet.create({
         container: {
             flex: 1,
             backgroundColor: primary,
@@ -165,7 +165,7 @@ const EditStage = ({ route, navigation }: any) => {
                     </View>
             }
         </Formik>
-    )
+    ) */
 }
 
-export default EditStage
+export default MatchSeDetailsAndEdit
