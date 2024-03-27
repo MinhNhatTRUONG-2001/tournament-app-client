@@ -1,9 +1,9 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { primary } from "../../theme/colors";
-import { Divider } from "react-native-paper";
+import { Divider, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
 import StageInfo from "./StageInfo";
-import MatchesSe from "../matches_se/MatchesSe";
+import MatchesSe from "../matches_se/MatchListSE";
 
 const StageDetails = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -15,13 +15,17 @@ const StageDetails = ({ route, navigation }: any) => {
         item: {
             padding: 5,
             margin: 5
+        },
+        text: {
+            alignSelf: 'center',
+            paddingTop: 10
         }
     });
 
-    const { token } = route.params;
-    const { stageId } = route.params;
-    const { stageList } = route.params;
-    const { setStageList } = route.params;
+    const { token } = route.params
+    const { stageId } = route.params
+    const { stageList } = route.params
+    const { setStageList } = route.params
     const [stageInfo, setStageInfo] = useState<any>()
     useEffect(() => {
         if (token) {
@@ -35,7 +39,8 @@ const StageDetails = ({ route, navigation }: any) => {
     return (
         <View style={styles.container}>
             {stageInfo &&
-                <ScrollView> 
+                <ScrollView>
+                    <Text variant="titleMedium" style={styles.text}>Stage information</Text>
                     <StageInfo
                         navigation={navigation}
                         token={token}
@@ -44,6 +49,7 @@ const StageDetails = ({ route, navigation }: any) => {
                         stageInfo={stageInfo}
                         setStageInfo={setStageInfo}/>
                     <Divider />
+                    <Text variant="titleMedium" style={styles.text}>Matches</Text>
                     {stageInfo.format_id === 1 &&
                         <MatchesSe
                             navigation={navigation}

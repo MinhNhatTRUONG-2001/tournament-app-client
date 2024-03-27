@@ -9,7 +9,7 @@ import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 
-const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
+const EditMatchScoresSE = ({ route, navigation }: any) => {
     /* const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -40,21 +40,21 @@ const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
     });
 
     const { token } = route.params
-    const { stageList } = route.params
-    const { setStageList } = route.params
-    const { stageInfo } = route.params
-    const { setStageInfo } = route.params
-    const [startDate, setStartDate] = useState(new Date(stageInfo.start_date))
-    const [endDate, setEndDate] = useState(new Date(stageInfo.end_date))
+    const { matchList } = route.params
+    const { setMatchList } = route.params
+    const { matchInfo } = route.params
+    const { setMatchInfo } = route.params
+    const [startDate, setStartDate] = useState(new Date(matchInfo.start_date))
+    const [endDate, setEndDate] = useState(new Date(matchInfo.end_date))
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
     
     const initialValues = {
-        'name': stageInfo.name,
-        'tournament_id': stageInfo.tournament_id,
+        'name': matchInfo.name,
+        'tournament_id': matchInfo.tournament_id,
         'start_date': startDate.toISOString(),
         'end_date': endDate.toISOString(),
-        'places': stageInfo.places,
-        'description': stageInfo.description,
+        'places': matchInfo.places,
+        'description': matchInfo.description,
         
     }
 
@@ -95,7 +95,7 @@ const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
 
     const updateStage = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${matchInfo.id}/${token}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,8 +104,8 @@ const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
         })
         .then(response => response.json())
         .then(data => {
-            setStageList(stageList.map((s: any) => s.id === stageInfo.id ? data : s))
-            setStageInfo(data)
+            setMatchList(matchList.map((s: any) => s.id === matchInfo.id ? data : s))
+            setMatchInfo(data)
             navigation.goBack()
         })
         .catch((error: any) => {
@@ -168,4 +168,4 @@ const MatchSeDetailsAndEdit = ({ route, navigation }: any) => {
     ) */
 }
 
-export default MatchSeDetailsAndEdit
+export default EditMatchScoresSE

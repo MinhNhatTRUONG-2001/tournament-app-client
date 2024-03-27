@@ -2,7 +2,8 @@ import { Alert, StyleSheet, View } from "react-native";
 import { error, primary } from "../../theme/colors";
 import { List, Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { deviceTimezone } from "../../data/deviceTimezone";
 
 const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setStageInfo }: any) => {
     const styles = StyleSheet.create({
@@ -13,6 +14,15 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
         item: {
             marginHorizontal: 5
         },
+        keyText: {
+            marginHorizontal: 10,
+            marginVertical: 5,
+            fontSize: 16,
+            fontWeight: 'bold'
+        },
+        valueText: {
+            fontWeight: 'normal'
+        },
         errorText: {
             alignSelf: 'center',
             paddingBottom: 5,
@@ -21,18 +31,7 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
     });
 
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
-    var displayedStageInfo = { ...stageInfo }
-    delete displayedStageInfo["id"]
-    delete displayedStageInfo["tournament_id"]
-    delete displayedStageInfo["number_of_teams_per_group"]
-    delete displayedStageInfo["number_of_groups"]
-    delete displayedStageInfo["stage_order"]
-    delete displayedStageInfo["number_of_legs_per_round"]
-    delete displayedStageInfo["best_of_per_round"]
-    delete displayedStageInfo["include_third_place_match"]
-    delete displayedStageInfo["third_place_match_number_of_legs"]
-    delete displayedStageInfo["third_place_match_best_of"]
+    const [stageFormat, setStageFormat] = useState<string>()
 
     const deleteStage = () => {
         Alert.prompt(
@@ -55,27 +54,39 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
             })
     }
 
+    useEffect(() => {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stage_format/${stageInfo.format_id}`)
+            .then(response => response.json())
+            .then((data) => {
+                setStageFormat(data.name)
+            })
+            .catch(console.error)
+    }, [])
+
     return (
         <View style={styles.container}>
-            <List.Section>
-                {
-                    Object.entries(displayedStageInfo).map(([key, value]: any) => {
-                        var displayedValue: string = '' 
-                        if (value.constructor === Array) {
-                            displayedValue = value.length > 0 ? value.join('; ') : 'N/A'
-                        }
-                        else {
-                            displayedValue = value ? value as string : 'N/A'
-                        }
-                        return <List.Item
-                            key={key}
-                            title={key}
-                            description={displayedValue}
-                            style={styles.item}
-                        />
-                    })
-                }
-            </List.Section>
+            {stageInfo &&
+                <>
+                    <Text style={styles.keyText}>Name:
+                        <Text style={styles.valueText}> {stageInfo.name}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Format:
+                        <Text style={styles.valueText}> {stageFormat}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Start date:
+                        <Text style={styles.valueText}> {stageInfo.start_date ? `${new Date(stageInfo.start_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>End date:
+                        <Text style={styles.valueText}> {stageInfo.end_date ? `${new Date(stageInfo.end_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Places:
+                        <Text style={styles.valueText}> {stageInfo.places.length > 0 ? stageInfo.places.join('; ') : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Description:
+                        <Text style={styles.valueText}> {stageInfo.description ? stageInfo.description : 'N/A'}</Text>
+                    </Text>
+                </>
+            }
             <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditStage", { navigation, token, stageList, setStageList, stageInfo, setStageInfo })} />
             <CustomButton buttonText="Delete" onPress={deleteStage} buttonColor={error} />
             <Text style={styles.errorText}>{serverErrorMessage}</Text>

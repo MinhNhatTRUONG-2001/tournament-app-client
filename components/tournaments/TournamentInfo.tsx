@@ -3,6 +3,7 @@ import { error, primary } from "../../theme/colors";
 import { List, Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 import { useState } from "react";
+import { deviceTimezone } from "../../data/deviceTimezone";
 
 const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo }: any) => {
     const styles = StyleSheet.create({
@@ -13,6 +14,15 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
         item: {
             marginHorizontal: 5
         },
+        keyText: {
+            marginHorizontal: 10,
+            marginVertical: 5,
+            fontSize: 16,
+            fontWeight: 'bold'
+        },
+        valueText: {
+            fontWeight: 'normal'
+        },
         errorText: {
             alignSelf: 'center',
             paddingBottom: 5,
@@ -21,9 +31,6 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
     });
 
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    var displayedTournamentInfo = { ...tournamentInfo }
-    delete displayedTournamentInfo["id"]
-    delete displayedTournamentInfo["user_id"]
 
     const deleteTournament = () => {
         Alert.prompt(
@@ -32,13 +39,13 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
             (input: string) => {
                 if (input === tournamentInfo.name) {
                     fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}/${token}`, { method: 'DELETE' })
-                    .then(() => {
-                        setTournamentList(tournamentList.filter((t: any) => t.id !== tournamentInfo.id))
-                        navigation.goBack()
-                    })
-                    .catch((error: any) => {
-                        setServerErrorMessage(error.message)
-                    })
+                        .then(() => {
+                            setTournamentList(tournamentList.filter((t: any) => t.id !== tournamentInfo.id))
+                            navigation.goBack()
+                        })
+                        .catch((error: any) => {
+                            setServerErrorMessage(error.message)
+                        })
                 }
                 else {
                     Alert.alert("Error", "The input is not correct")
@@ -48,28 +55,28 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
 
     return (
         <View style={styles.container}>
-            <List.Section>
-                {
-                    Object.entries(displayedTournamentInfo).map(([key, value]: any) => {
-                        var displayedValue: string = '' 
-                        if (value.constructor === Array) {
-                            displayedValue = value.length > 0 ? value.join('; ') : 'N/A'
-                        }
-                        else {
-                            displayedValue = value ? value as string : 'N/A'
-                        }
-                        return <List.Item
-                            key={key}
-                            title={key}
-                            description={displayedValue}
-                            style={styles.item}
-                        />
-                    })
-                }
-            </List.Section>
-            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
-            <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
-            <Text style={styles.errorText}>{serverErrorMessage}</Text>
+            {tournamentInfo &&
+                <>
+                    <Text style={styles.keyText}>Name:
+                        <Text style={styles.valueText}> {tournamentInfo.name}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Start date:
+                        <Text style={styles.valueText}> {tournamentInfo.start_date ? `${new Date(tournamentInfo.start_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>End date:
+                        <Text style={styles.valueText}> {tournamentInfo.end_date ? `${new Date(tournamentInfo.end_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Places:
+                        <Text style={styles.valueText}> {tournamentInfo.places.length > 0 ? tournamentInfo.places.join('; ') : 'N/A'}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>Description:
+                        <Text style={styles.valueText}> {tournamentInfo.description ? tournamentInfo.description : 'N/A'}</Text>
+                    </Text>
+                    <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
+                    <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
+                    <Text style={styles.errorText}>{serverErrorMessage}</Text>
+                </>
+            }
         </View>
     )
 }

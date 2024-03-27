@@ -22,10 +22,10 @@ const TournamentDetails = ({ route, navigation }: any) => {
         }
     });
 
-    const { token } = route.params;
-    const { id } = route.params;
-    const { tournamentList } = route.params;
-    const { setTournamentList } = route.params;
+    const { token } = route.params
+    const { id } = route.params
+    const { tournamentList } = route.params
+    const { setTournamentList } = route.params
     const [tournamentInfo, setTournamentInfo] = useState<any>()
     useEffect(() => {
         if (token) {
@@ -39,6 +39,7 @@ const TournamentDetails = ({ route, navigation }: any) => {
     return (
         <View style={styles.container}>
             <ScrollView>
+                <Text variant="titleMedium" style={styles.text}>Tournament information</Text>
                 <TournamentInfo
                     navigation={navigation}
                     token={token}
