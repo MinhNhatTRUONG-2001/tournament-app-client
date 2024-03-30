@@ -32,9 +32,9 @@ const MatchesSe = ({ navigation, token, stageId, includeThirdPlaceMatch  }: any)
                 .then(response => response.json())
                 .then(data => {
                     setMatchList(data)
-                    var groupNumberArray: number[] = [], roundNumberArray: number[] = []
-                    groupNumberArray = Array.from(new Set(data.map((match: any) => match.group_number)))
-                    roundNumberArray = Array.from(new Set(data.map((match: any) => match.round_number)))
+                    var groupNumberArray: any[] = [], roundNumberArray: any[] = []
+                    groupNumberArray = Array.from(new Set(data.map((match: any) => match.group_number))).sort()
+                    roundNumberArray = Array.from(new Set(data.map((match: any) => match.round_number))).sort()
                     var groupNumberButtonPropertiesObject: any[] = [], roundNumberButtonPropertiesObject: any[] = []
                     groupNumberArray.map((n) => groupNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Group ' + n }))
                     roundNumberArray.map((n) => roundNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Round ' + n }))

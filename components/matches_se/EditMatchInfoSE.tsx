@@ -1,16 +1,15 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
-import { error, primary, secondary } from "../../theme/colors";
-import { FieldArray, Formik } from "formik";
+import { error, primary } from "../../theme/colors";
+import { Formik } from "formik";
 import * as yup from 'yup';
-import { Text, TextInput } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import moment from "moment";
 
 const EditMatchInfoSE = ({ route, navigation }: any) => {
-    /* const styles = StyleSheet.create({
+    const styles = StyleSheet.create({
         container: {
             flex: 1,
             backgroundColor: primary,
@@ -18,6 +17,10 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
         },
         container2: {
             backgroundColor: primary,
+            flexDirection: 'row',
+        },
+        datetimeContainer: {
+            justifyContent:'center',
             flexDirection: 'row',
         },
         text: {
@@ -28,11 +31,8 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
             paddingBottom: 5,
             color: error
         },
-        datePicker: {
-            alignItems: 'center'
-        },
         multilineTextInput: {
-            minHeight: 150,
+            minHeight: 100,
             textAlignVertical: 'top',
             marginHorizontal: 5,
             marginBottom: 10
@@ -44,58 +44,30 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
     const { setMatchList } = route.params
     const { matchInfo } = route.params
     const { setMatchInfo } = route.params
-    const [startDate, setStartDate] = useState(new Date(matchInfo.start_date))
-    const [endDate, setEndDate] = useState(new Date(matchInfo.end_date))
+    const [startDatetime, setStartDatetime] = useState(matchInfo.start_datetime ? new Date(matchInfo.start_datetime) : (new Date(Date.now())))
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
     
     const initialValues = {
-        'name': matchInfo.name,
-        'tournament_id': matchInfo.tournament_id,
-        'start_date': startDate.toISOString(),
-        'end_date': endDate.toISOString(),
-        'places': matchInfo.places,
-        'description': matchInfo.description,
-        
+        'start_datetime': startDatetime.toISOString(),
+        'place': matchInfo.place,
+        'note': matchInfo.note,
     }
 
     const validationSchema = yup.object().shape({
-        name: yup
-            .string()
-            .max(100, "The maximum characters is 100")
-            .required("Name is required"),
-        start_date: yup
-            .date()
-            .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
-                const { end_date } = this.parent
-                const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
-                return isBeforeEndDate
-            }),
-        end_date: yup
+        start_datetime: yup
             .date(),
-        places: yup
-            .array()
-            .of(yup.string()),
-        description: yup
-            .string()
     })
 
-    const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
+    const changeStartDatetime = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
         if (event.type === "set" && date !== undefined) {
-            values["start_date"] = date?.toISOString()
-            setStartDate(date)
+            values["start_datetime"] = date?.toISOString()
+            setStartDatetime(date)
         }
-    };
+    }
 
-    const changeEndDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
-        if (event.type === "set" && date !== undefined) {
-            values["end_date"] = date?.toISOString()
-            setEndDate(date)
-        }
-    };
-
-    const updateStage = (values: any) => {
+    const updateMatchInfo = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${matchInfo.id}/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_info/${token}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +76,7 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
         })
         .then(response => response.json())
         .then(data => {
-            setMatchList(matchList.map((s: any) => s.id === matchInfo.id ? data : s))
+            setMatchList(matchList.map((m: any) => m.id === matchInfo.id ? data : m))
             setMatchInfo(data)
             navigation.goBack()
         })
@@ -114,49 +86,33 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
     }
 
     return (
-        <Formik initialValues={initialValues} onSubmit={updateStage} validationSchema={validationSchema}>
+        <Formik initialValues={initialValues} onSubmit={updateMatchInfo} validationSchema={validationSchema}>
             {
-                ({ handleSubmit, values, handleChange, errors }) =>
+                ({ handleSubmit, values }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="name" label="Name" />
-                            <Text style={styles.text}>Start date</Text>
-                            <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={startDate}
-                                    onChange={(event, date) => changeStartDate(event, date, values)}
-                                />
+                            <Text style={styles.text}>Start datetime</Text>
+                            <View style={styles.datetimeContainer}>
+                                <View>
+                                    <RNDateTimePicker
+                                        value={startDatetime}
+                                        mode="date"
+                                        onChange={(event, date) => changeStartDatetime(event, date, values)}
+                                    />
+                                </View>
+                                <View>
+                                    <RNDateTimePicker
+                                        value={startDatetime}
+                                        mode="time"
+                                        onChange={(event, date) => changeStartDatetime(event, date, values)}
+                                    />
+                                </View>
                             </View>
-                            <Text style={styles.text}>End date</Text>
-                            <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={endDate}
-                                    onChange={(event, date) => changeEndDate(event, date, values)}
-                                />
-                            </View>
-                            {(errors && errors.start_date) && <Text style={styles.errorText}>{errors.start_date}</Text>}
-                            <Text style={styles.text}>Places</Text>
-                            <FieldArray name="places">
-                                {({ push, remove }) => (
-                                    <>
-                                        {values.places.map((item: string, index: number) => (
-                                            <View style={styles.container2} key={index}>
-                                                <TextInput
-                                                    onChangeText={handleChange(`places.${index}`)}
-                                                    value={item}
-                                                    placeholder="Place"
-                                                />
-                                                <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
-                                            </View>
-                                        ))}
-                                        <CustomButton buttonText="Add Places" onPress={() => push('')} buttonColor={secondary} />
-                                    </>
-                                )}
-                            </FieldArray>
+                            <CustomTextInput name="place" label="Place" />
                             <CustomTextInput
                                 style={styles.multilineTextInput}
-                                name="description"
-                                label="Description"
+                                name="note"
+                                label="Note"
                                 multiline={true}
                             />
                             <CustomButton buttonText="Update" onPress={handleSubmit} />
@@ -165,7 +121,7 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
                     </View>
             }
         </Formik>
-    ) */
+    )
 }
 
 export default EditMatchInfoSE

@@ -1,9 +1,9 @@
 import { Alert, StyleSheet, View } from "react-native";
 import { error, primary } from "../../theme/colors";
-import { List, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 import { useState } from "react";
-import { deviceTimezone } from "../../data/deviceTimezone";
+import { getTimezone } from "../../data/getTimezone";
 
 const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo }: any) => {
     const styles = StyleSheet.create({
@@ -61,10 +61,10 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
                         <Text style={styles.valueText}> {tournamentInfo.name}</Text>
                     </Text>
                     <Text style={styles.keyText}>Start date:
-                        <Text style={styles.valueText}> {tournamentInfo.start_date ? `${new Date(tournamentInfo.start_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {tournamentInfo.start_date ? `${new Date(tournamentInfo.start_date).toLocaleString()} (UTC${getTimezone(new Date(tournamentInfo.start_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>End date:
-                        <Text style={styles.valueText}> {tournamentInfo.end_date ? `${new Date(tournamentInfo.end_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {tournamentInfo.end_date ? `${new Date(tournamentInfo.end_date).toLocaleString()} (UTC${getTimezone(new Date(tournamentInfo.end_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Places:
                         <Text style={styles.valueText}> {tournamentInfo.places.length > 0 ? tournamentInfo.places.join('; ') : 'N/A'}</Text>

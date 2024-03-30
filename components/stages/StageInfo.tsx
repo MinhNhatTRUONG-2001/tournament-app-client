@@ -1,9 +1,9 @@
 import { Alert, StyleSheet, View } from "react-native";
 import { error, primary } from "../../theme/colors";
-import { List, Text } from "react-native-paper";
+import { Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 import { useEffect, useState } from "react";
-import { deviceTimezone } from "../../data/deviceTimezone";
+import { getTimezone } from "../../data/getTimezone";
 
 const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setStageInfo }: any) => {
     const styles = StyleSheet.create({
@@ -74,10 +74,10 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
                         <Text style={styles.valueText}> {stageFormat}</Text>
                     </Text>
                     <Text style={styles.keyText}>Start date:
-                        <Text style={styles.valueText}> {stageInfo.start_date ? `${new Date(stageInfo.start_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {stageInfo.start_date ? `${new Date(stageInfo.start_date).toLocaleString()} (UTC${getTimezone(new Date(stageInfo.start_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>End date:
-                        <Text style={styles.valueText}> {stageInfo.end_date ? `${new Date(stageInfo.end_date).toLocaleString()} (UTC${deviceTimezone})` : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {stageInfo.end_date ? `${new Date(stageInfo.end_date).toLocaleString()} (UTC${getTimezone(new Date(stageInfo.end_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Places:
                         <Text style={styles.valueText}> {stageInfo.places.length > 0 ? stageInfo.places.join('; ') : 'N/A'}</Text>
