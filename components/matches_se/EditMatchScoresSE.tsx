@@ -1,16 +1,13 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
-import { error, primary, secondary } from "../../theme/colors";
+import { error, primary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
-import * as yup from 'yup';
-import { Text, TextInput } from "react-native-paper";
+import { Menu, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
-import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
-import moment from "moment";
 
 const EditMatchScoresSE = ({ route, navigation }: any) => {
-    /* const styles = StyleSheet.create({
+    const styles = StyleSheet.create({
         container: {
             flex: 1,
             backgroundColor: primary,
@@ -21,7 +18,14 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
             flexDirection: 'row',
         },
         text: {
-            marginHorizontal: 5
+            marginHorizontal: 5,
+            marginTop: 5
+        },
+        subText: {
+            marginHorizontal: 10,
+            marginVertical: 5,
+            fontSize: 12,
+            fontStyle: 'italic'
         },
         errorText: {
             alignSelf: 'center',
@@ -44,69 +48,109 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
     const { setMatchList } = route.params
     const { matchInfo } = route.params
     const { setMatchInfo } = route.params
-    const [startDate, setStartDate] = useState(new Date(matchInfo.start_date))
-    const [endDate, setEndDate] = useState(new Date(matchInfo.end_date))
+    const [showTeamsMenu, setShowTeamsMenu] = useState<boolean>(false)
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
-    const initialValues = {
-        'name': matchInfo.name,
-        'tournament_id': matchInfo.tournament_id,
-        'start_date': startDate.toISOString(),
-        'end_date': endDate.toISOString(),
-        'places': matchInfo.places,
-        'description': matchInfo.description,
-        
+
+    var team1TotalScore = 0, team2TotalScore = 0
+    if (matchInfo.team_1_scores) matchInfo.team_1_scores.forEach((n: number) => team1TotalScore += n)
+    if (matchInfo.team_2_scores) matchInfo.team_2_scores.forEach((n: number) => team2TotalScore += n)
+    var probe = 0, team1Subscores: any[] = [], team2Subscores: any[] = []
+    if (matchInfo.best_of > 0) {
+        for (var i = 0; i < matchInfo.number_of_legs; i++) {
+            var team1Subscore = [], team2Subscore = [], endOfLegPos = probe + matchInfo.best_of
+            for (var j = probe; j < endOfLegPos; j++) {
+                team1Subscore.push(matchInfo.team_1_subscores[j])
+                team2Subscore.push(matchInfo.team_2_subscores[j])
+                probe++
+            }
+            team1Subscores.push(team1Subscore)
+            team2Subscores.push(team2Subscore)
+        }
     }
 
-    const validationSchema = yup.object().shape({
-        name: yup
-            .string()
-            .max(100, "The maximum characters is 100")
-            .required("Name is required"),
-        start_date: yup
-            .date()
-            .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
-                const { end_date } = this.parent
-                const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
-                return isBeforeEndDate
-            }),
-        end_date: yup
-            .date(),
-        places: yup
-            .array()
-            .of(yup.string()),
-        description: yup
-            .string()
-    })
+    type initialValuesType = {
+        'winner': string | null | undefined,
+        'team_1_scores': number[],
+        'team_2_scores': number[],
+        'team_1_subscores': any[] | null | undefined,
+        'team_2_subscores': any[] | null | undefined,
+    }
 
-    const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
-        if (event.type === "set" && date !== undefined) {
-            values["start_date"] = date?.toISOString()
-            setStartDate(date)
+    const initialValues: initialValuesType = {
+        'winner': matchInfo.winner,
+        'team_1_scores': matchInfo.team_1_scores,
+        'team_2_scores': matchInfo.team_2_scores,
+        'team_1_subscores': team1Subscores,
+        'team_2_subscores': team2Subscores,
+    }
+
+    const updateMatchScores = (values: any) => {
+        var requestBody = { ...values }
+        if (requestBody["winner"] === "") {
+            requestBody["winner"] = null
         }
-    };
-
-    const changeEndDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
-        if (event.type === "set" && date !== undefined) {
-            values["end_date"] = date?.toISOString()
-            setEndDate(date)
+        for (var i = 0; i < requestBody["team_1_scores"].length; i++) {
+            if (!requestBody["team_1_scores"][i]) {
+                requestBody["team_1_scores"][i] = 0
+            }
+            else {
+                requestBody["team_1_scores"][i] = parseInt(requestBody["team_1_scores"][i])
+            }
         }
-    };
-
-    const updateStage = (values: any) => {
-        //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${matchInfo.id}/${token}`, {
+        for (var i = 0; i < requestBody["team_2_scores"].length; i++) {
+            if (!requestBody["team_2_scores"][i]) {
+                requestBody["team_2_scores"][i] = 0;
+            } else {
+                requestBody["team_2_scores"][i] = parseInt(requestBody["team_2_scores"][i]);
+            }
+        }
+        if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
+            requestBody["team_1_subscores"] = null
+            requestBody["team_2_subscores"] = null
+        }
+        else {
+            requestBody["team_1_subscores"] = requestBody["team_1_subscores"].flat()
+            requestBody["team_2_subscores"] = requestBody["team_2_subscores"].flat()
+            for (var i = 0; i < requestBody["team_1_subscores"].length; i++) {
+                if (!requestBody["team_1_subscores"][i]) {
+                    requestBody["team_1_subscores"][i] = 0
+                }
+                else {
+                    requestBody["team_1_subscores"][i] = parseInt(requestBody["team_1_subscores"][i])
+                }
+            }
+            for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
+                if (!requestBody["team_2_subscores"][i]) {
+                    requestBody["team_2_subscores"][i] = 0
+                }
+                else {
+                    requestBody["team_2_subscores"][i] = parseInt(requestBody["team_2_subscores"][i])
+                }
+            }
+        }
+        console.log(requestBody)
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_score/${token}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(values),
+            body: JSON.stringify(requestBody),
         })
-        .then(response => response.json())
+        .then(async response => {
+            if (response.ok) {
+                return response.json()
+            }
+            else throw new Error(await response.text())
+        })
         .then(data => {
-            setMatchList(matchList.map((s: any) => s.id === matchInfo.id ? data : s))
             setMatchInfo(data)
-            navigation.goBack()
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${matchInfo.stage_id}/${token}`)
+                .then(response => response.json())
+                .then(data2 => {
+                    setMatchList(data2)
+                    navigation.goBack()
+                })
+                .catch(console.error)
         })
         .catch((error: any) => {
             setServerErrorMessage(error.message)
@@ -114,58 +158,160 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
     }
 
     return (
-        <Formik initialValues={initialValues} onSubmit={updateStage} validationSchema={validationSchema}>
+        <Formik initialValues={initialValues} onSubmit={updateMatchScores}>
             {
                 ({ handleSubmit, values, handleChange, errors }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="name" label="Name" />
-                            <Text style={styles.text}>Start date</Text>
-                            <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={startDate}
-                                    onChange={(event, date) => changeStartDate(event, date, values)}
-                                />
-                            </View>
-                            <Text style={styles.text}>End date</Text>
-                            <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={endDate}
-                                    onChange={(event, date) => changeEndDate(event, date, values)}
-                                />
-                            </View>
-                            {(errors && errors.start_date) && <Text style={styles.errorText}>{errors.start_date}</Text>}
-                            <Text style={styles.text}>Places</Text>
-                            <FieldArray name="places">
-                                {({ push, remove }) => (
-                                    <>
-                                        {values.places.map((item: string, index: number) => (
+                            <Menu
+                                visible={showTeamsMenu}
+                                onDismiss={() => setShowTeamsMenu(false)}
+                                anchor={
+                                    <CustomTextInput
+                                        name="winner"
+                                        label="Winner"
+                                        editable={false}
+                                        onPressIn={() => setShowTeamsMenu(true)}
+                                    />
+                                }
+                            >
+                                <ScrollView>
+                                    {[matchInfo.team_1, matchInfo.team_2].map(team => <Menu.Item
+                                        onPress={() => {
+                                            values["winner"] = team
+                                            setShowTeamsMenu(false)
+                                        }}
+                                        title={team}
+                                    />)}
+                                </ScrollView>
+                            </Menu>
+                            <Text style={styles.text}>{matchInfo.team_1} Scores</Text>
+                            <FieldArray name="team_1_scores">
+                                {() => (
+                                    <ScrollView horizontal>
+                                        {values.team_1_scores.map((item: number, index: number) => (
                                             <View style={styles.container2} key={index}>
+                                                <Text style={styles.subText}>Leg {index + 1}</Text>
                                                 <TextInput
-                                                    onChangeText={handleChange(`places.${index}`)}
-                                                    value={item}
-                                                    placeholder="Place"
+                                                    key={index}
+                                                    style={styles.text}
+                                                    inputMode="numeric"
+                                                    onChangeText={(text) => {
+                                                        handleChange(`team_1_scores.${index}`)(text)
+                                                        var team1TotalScore = 0, team2TotalScore = 0
+                                                        values["team_1_scores"][index] = parseInt(text) || 0
+                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseInt(n))
+                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseInt(n))
+                                                        if (team1TotalScore > team2TotalScore) {
+                                                            handleChange(`winner`)(matchInfo.team_1)
+                                                        }
+                                                        else {
+                                                            handleChange(`winner`)(matchInfo.team_2)
+                                                        }
+                                                    }}
+                                                    value={item.toString()}
+                                                    placeholder={`Leg ${index + 1}`}
                                                 />
-                                                <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                             </View>
                                         ))}
-                                        <CustomButton buttonText="Add Places" onPress={() => push('')} buttonColor={secondary} />
-                                    </>
+                                    </ScrollView>
                                 )}
                             </FieldArray>
-                            <CustomTextInput
-                                style={styles.multilineTextInput}
-                                name="description"
-                                label="Description"
-                                multiline={true}
-                            />
+                            {(errors && errors.team_1_scores) && <Text style={styles.errorText}>{errors.team_1_scores}</Text>}
+                            <Text style={styles.text}>{matchInfo.team_2} Scores</Text>
+                            <FieldArray name="team_2_scores">
+                                {() => (
+                                    <ScrollView horizontal>
+                                        {values.team_2_scores.map((item: number, index: number) => (
+                                            <View style={styles.container2} key={index}>
+                                                <Text style={styles.subText}>Leg {index + 1}</Text>
+                                                <TextInput
+                                                    key={index}
+                                                    style={styles.text}
+                                                    inputMode="numeric"
+                                                    onChangeText={(text) => {
+                                                        handleChange(`team_2_scores.${index}`)(text)
+                                                        var team1TotalScore = 0, team2TotalScore = 0
+                                                        values["team_2_scores"][index] = parseInt(text) || 0
+                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseInt(n))
+                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseInt(n))
+                                                        if (team1TotalScore > team2TotalScore) {
+                                                            handleChange(`winner`)(matchInfo.team_1)
+                                                        }
+                                                        else {
+                                                            handleChange(`winner`)(matchInfo.team_2)
+                                                        }
+                                                    }}
+                                                    value={item.toString()}
+                                                    placeholder={`Leg ${index + 1}`}
+                                                />
+                                            </View>
+                                        ))}
+                                    </ScrollView>
+                                )}
+                            </FieldArray>
+                            {(errors && errors.team_2_scores) && <Text style={styles.errorText}>{errors.team_2_scores}</Text>}
+                            {matchInfo.best_of > 0 &&
+                                <>
+                                    <Text style={styles.text}>{matchInfo.team_1} Subscores</Text>
+                                    <FieldArray name="team_1_subscores">
+                                        {() => (
+                                            <>
+                                                {values.team_1_subscores?.map((subscoreArray: any[], outerIndex: number) => (
+                                                    <ScrollView horizontal key={outerIndex}>
+                                                        <Text style={styles.subText}>Leg {outerIndex + 1}</Text>
+                                                        {Array.isArray(subscoreArray) && subscoreArray.map((subscore: any, innerIndex: number) => (
+                                                            <View style={styles.container2} key={innerIndex}>
+                                                                <TextInput
+                                                                    key={innerIndex}
+                                                                    style={styles.text}
+                                                                    inputMode="numeric"
+                                                                    onChangeText={handleChange(`team_1_subscores.${outerIndex}.${innerIndex}`)}
+                                                                    value={subscore.toString()}
+                                                                    placeholder={`Leg ${outerIndex + 1}, Subscore ${innerIndex + 1}`}
+                                                                />
+                                                            </View>
+                                                        ))}
+                                                    </ScrollView>
+                                                ))}
+                                            </>
+                                        )}
+                                    </FieldArray>
+                                    {(errors && errors.team_1_subscores) && <Text style={styles.errorText}>{errors.team_1_subscores.toString()}</Text>}
+                                    <Text style={styles.text}>{matchInfo.team_2} Subscores</Text>
+                                    <FieldArray name="team_2_subscores">
+                                        {() => (
+                                            <>
+                                                {values.team_2_subscores?.map((subscoreArray: any[], outerIndex: number) => (
+                                                    <ScrollView horizontal key={outerIndex}>
+                                                        <Text style={styles.subText}>Leg {outerIndex + 1}</Text>
+                                                        {Array.isArray(subscoreArray) && subscoreArray.map((subscore: any, innerIndex: number) => (
+                                                            <View style={styles.container2} key={innerIndex}>
+                                                                <TextInput
+                                                                    key={innerIndex}
+                                                                    style={styles.text}
+                                                                    inputMode="numeric"
+                                                                    onChangeText={handleChange(`team_2_subscores.${outerIndex}.${innerIndex}`)}
+                                                                    value={subscore.toString()}
+                                                                    placeholder={`Subscore ${innerIndex + 1}`}
+                                                                />
+                                                            </View>
+                                                        ))}
+                                                    </ScrollView>
+                                                ))}
+                                            </>
+                                        )}
+                                    </FieldArray>
+                                    {(errors && errors.team_2_subscores) && <Text style={styles.errorText}>{errors.team_2_subscores.toString()}</Text>}
+                                </>
+                            }
                             <CustomButton buttonText="Update" onPress={handleSubmit} />
                             <Text style={styles.errorText}>{serverErrorMessage}</Text>
                         </ScrollView>
                     </View>
             }
         </Formik>
-    ) */
+    )
 }
 
 export default EditMatchScoresSE

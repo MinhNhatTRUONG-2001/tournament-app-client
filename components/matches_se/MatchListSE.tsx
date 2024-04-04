@@ -81,6 +81,7 @@ const MatchesSe = ({ navigation, token, stageId, includeThirdPlaceMatch  }: any)
                                 <DataTable.Title style={{ width: 170, justifyContent: 'center' }}>Winner's Next Round Match</DataTable.Title>
                             </DataTable.Header>
                             {matchList.filter(match => match.group_number.toString() === selectedGroupNumber && match.round_number.toString() === selectedRoundNumber)
+                                .sort((a, b) => a.match_number - b.match_number)
                                 .map((match, index) => {
                                     var team1Name = match.team_1, team2Name = match.team_2
                                     if (match.winner && match.winner === match.team_1) {

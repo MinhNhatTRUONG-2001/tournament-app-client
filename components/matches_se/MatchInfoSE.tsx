@@ -33,18 +33,15 @@ const MatchInfoSE = ({ matchInfo }: any) => {
     var team1TotalScore = 0, team2TotalScore = 0
     if (matchInfo.team_1_scores) matchInfo.team_1_scores.forEach((n: number) => team1TotalScore += n)
     if (matchInfo.team_2_scores) matchInfo.team_2_scores.forEach((n: number) => team2TotalScore += n)
-    var probe = 0, totalSets: any[] = [], team1Subscores: any[] = [], team2Subscores: any[] = []
-    if (matchInfo.team_1_subscores && matchInfo.team_2_subscores && matchInfo.team_1_scores && matchInfo.team_2_scores) {
+    var probe = 0, team1Subscores: any[] = [], team2Subscores: any[] = []
+    if (matchInfo.best_of > 0) {
         for (var i = 0; i < matchInfo.number_of_legs; i++) {
-            var totalSet = matchInfo.team_1_scores[i] + matchInfo.team_2_scores[i]
-            console.log(totalSet)
-            var team1Subscore = [], team2Subscore = [], endOfLegPos = probe + totalSet
+            var team1Subscore = [], team2Subscore = [], endOfLegPos = probe + matchInfo.best_of
             for (var j = probe; j < endOfLegPos; j++) {
                 team1Subscore.push(matchInfo.team_1_subscores[j])
                 team2Subscore.push(matchInfo.team_2_subscores[j])
                 probe++
             }
-            totalSets.push(totalSet)
             team1Subscores.push(team1Subscore)
             team2Subscores.push(team2Subscore)
         }
@@ -92,14 +89,14 @@ const MatchInfoSE = ({ matchInfo }: any) => {
                                 <DataTable>
                                     <DataTable.Row>
                                         <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>Set</DataTable.Title>
-                                        {[...Array(totalSets[index])].map((_, index) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{index + 1}</DataTable.Cell>)}
+                                        {[...Array(matchInfo.best_of)].map((_, index) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{index + 1}</DataTable.Cell>)}
                                     </DataTable.Row>
                                     <DataTable.Row>
-                                        <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>Team 1</DataTable.Title>
+                                        <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_1}</DataTable.Title>
                                         {team1Subscores[index].map((value: any) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                                     </DataTable.Row>
                                     <DataTable.Row>
-                                        <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>Team 2</DataTable.Title>
+                                        <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_2}</DataTable.Title>
                                         {team2Subscores[index].map((value: any) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                                     </DataTable.Row>
                                 </DataTable>
