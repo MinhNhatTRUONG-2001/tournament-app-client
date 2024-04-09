@@ -1,10 +1,10 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
-import { error, primary, secondary } from "../../theme/colors";
+import { error, primary, secondary, tertiary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
-import { Text, TextInput } from "react-native-paper";
+import { Checkbox, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
@@ -41,6 +41,7 @@ const NewTournament = ({ route, navigation }: any) => {
 
     const [startDate, setStartDate] = useState(new Date())
     const [endDate, setEndDate] = useState(new Date())
+    const [privateTournament, setPrivateTournament] = useState<boolean>(true)
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
     const { token } = route.params
     const { tournamentList } = route.params
@@ -51,7 +52,8 @@ const NewTournament = ({ route, navigation }: any) => {
         'start_date': startDate.toISOString(),
         'end_date': endDate.toISOString(),
         'places': [],
-        'description': ''
+        'description': '',
+        'is_private': true
     }
 
     const validationSchema = yup.object().shape({
@@ -153,6 +155,18 @@ const NewTournament = ({ route, navigation }: any) => {
                                 name="description"
                                 label="Description"
                                 multiline={true}
+                            />
+                            <Checkbox.Item
+                                label="Set as private tournament"
+                                labelStyle={{ textAlign: 'left' }}
+                                status={privateTournament ? 'checked' : 'unchecked'}
+                                onPress={() => {
+                                    values["is_private"] = !privateTournament
+                                    setPrivateTournament(!privateTournament)
+                                }}
+                                color={tertiary}
+                                position="leading"
+                                mode="android"
                             />
                             <Text style={styles.errorText}>{serverErrorMessage}</Text>
                             <CustomButton buttonText="Create tournament" onPress={handleSubmit} />

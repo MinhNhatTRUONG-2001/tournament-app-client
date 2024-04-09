@@ -4,6 +4,7 @@ import { Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 import { useEffect, useState } from "react";
 import { getTimezone } from "../../data/getTimezone";
+import { stageFormatsEnum } from "../../data/stageFormatsEnum";
 
 const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setStageInfo }: any) => {
     const styles = StyleSheet.create({
@@ -85,11 +86,27 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
                     <Text style={styles.keyText}>Description:
                         <Text style={styles.valueText}> {stageInfo.description ? stageInfo.description : 'N/A'}</Text>
                     </Text>
+                    {stageInfo.format_id === stageFormatsEnum.ROUND_ROBIN &&
+                        <>
+                            <Text style={styles.keyText}>Win point:
+                                <Text style={styles.valueText}> {stageInfo.win_point}</Text>
+                            </Text>
+                            <Text style={styles.keyText}>Draw point:
+                                <Text style={styles.valueText}> {stageInfo.draw_point}</Text>
+                            </Text><Text style={styles.keyText}>Lose point:
+                                <Text style={styles.valueText}> {stageInfo.lose_point}</Text>
+                            </Text>
+                        </>
+                    }
                 </>
             }
-            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditStage", { navigation, token, stageList, setStageList, stageInfo, setStageInfo })} />
-            <CustomButton buttonText="Delete" onPress={deleteStage} buttonColor={error} />
-            <Text style={styles.errorText}>{serverErrorMessage}</Text>
+            {token &&
+                <>
+                    <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditStage", { navigation, token, stageList, setStageList, stageInfo, setStageInfo })} />
+                    <CustomButton buttonText="Delete" onPress={deleteStage} buttonColor={error} />
+                    <Text style={styles.errorText}>{serverErrorMessage}</Text>
+                </>
+            }
         </View>
     )
 }

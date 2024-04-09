@@ -12,6 +12,10 @@ import MatchDetailsSE from "../matches_se/MatchDetailsSE";
 import EditTeamNamesSE from "../matches_se/EditTeamNamesSE";
 import EditMatchScoresSE from "../matches_se/EditMatchScoresSE";
 import EditMatchInfoSE from "../matches_se/EditMatchInfoSE";
+import MatchDetailsRR from "../matches_rr/MatchDetailsRR";
+import EditTeamNamesRR from "../matches_rr/EditTeamNamesRR";
+import EditMatchInfoRR from "../matches_rr/EditMatchInfoRR";
+import EditMatchScoresRR from "../matches_rr/EditMatchScoresRR";
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +109,34 @@ const TournamentStack = ({ navigation, token }: any) => {
         <Stack.Screen
             name="EditMatchScoresSE"
             component={EditMatchScoresSE}
+            options={{
+                title: 'Edit Match Scores',
+            }}
+        />
+        <Stack.Screen
+            name="MatchDetailsRR"
+            component={MatchDetailsRR}
+            options={{
+                title: 'Match Details',
+            }}
+        />
+        <Stack.Screen
+            name="EditTeamNamesRR"
+            component={EditTeamNamesRR}
+            options={{
+                title: 'Edit Team Names',
+            }}
+        />
+        <Stack.Screen
+            name="EditMatchInfoRR"
+            component={EditMatchInfoRR}
+            options={{
+                title: 'Edit Match Information',
+            }}
+        />
+        <Stack.Screen
+            name="EditMatchScoresRR"
+            component={EditMatchScoresRR}
             options={{
                 title: 'Edit Match Scores',
             }}

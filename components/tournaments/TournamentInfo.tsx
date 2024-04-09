@@ -72,9 +72,13 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
                     <Text style={styles.keyText}>Description:
                         <Text style={styles.valueText}> {tournamentInfo.description ? tournamentInfo.description : 'N/A'}</Text>
                     </Text>
-                    <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
-                    <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
-                    <Text style={styles.errorText}>{serverErrorMessage}</Text>
+                    {token &&
+                        <>
+                            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
+                            <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
+                            <Text style={styles.errorText}>{serverErrorMessage}</Text>
+                        </>
+                    }
                 </>
             }
         </View>

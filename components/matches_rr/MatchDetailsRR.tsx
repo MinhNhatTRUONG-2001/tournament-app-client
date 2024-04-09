@@ -2,10 +2,10 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import CustomButton from "../custom/CustomButton";
 import { primary } from "../../theme/colors";
 import { useEffect, useState } from "react";
-import MatchInfoSE from "./MatchInfoSE";
+import MatchInfoRR from "./MatchInfoRR";
 import { Divider } from "react-native-paper";
 
-const MatchDetailsSE = ({ route, navigation }: any) => {
+const MatchDetailsRR = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -26,13 +26,13 @@ const MatchDetailsSE = ({ route, navigation }: any) => {
     
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}/${token}`)
                 .then(response => response.json())
                 .then(data => setMatchInfo(data))
                 .catch(console.error)
         }
         else {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchId}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}`)
                 .then(response => response.json())
                 .then(data => setMatchInfo(data))
                 .catch(console.error)
@@ -43,15 +43,13 @@ const MatchDetailsSE = ({ route, navigation }: any) => {
         <View style={styles.container}>
             {matchInfo &&
                 <ScrollView> 
-                    <MatchInfoSE matchInfo={matchInfo} />
+                    <MatchInfoRR matchInfo={matchInfo} />
                     <Divider />
                     {token &&
                         <>
-                            {matchInfo.round_number === 1 &&
-                                <CustomButton buttonText="Edit team name" onPress={() => navigation.navigate("EditTeamNamesSE", { navigation, token, setMatchList, matchInfo, setMatchInfo })} />
-                            }
-                            <CustomButton buttonText="Edit match information" onPress={() => navigation.navigate("EditMatchInfoSE", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
-                            <CustomButton buttonText="Edit match scores" onPress={() => navigation.navigate("EditMatchScoresSE", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
+                            <CustomButton buttonText="Edit team name" onPress={() => navigation.navigate("EditTeamNamesRR", { navigation, token, setMatchList, matchInfo, setMatchInfo })} />
+                            <CustomButton buttonText="Edit match information" onPress={() => navigation.navigate("EditMatchInfoRR", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
+                            <CustomButton buttonText="Edit match scores" onPress={() => navigation.navigate("EditMatchScoresRR", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
                         </>
                     }
                 </ScrollView>
@@ -60,4 +58,4 @@ const MatchDetailsSE = ({ route, navigation }: any) => {
     )
 }
 
-export default MatchDetailsSE
+export default MatchDetailsRR

@@ -54,8 +54,7 @@ const EditStage = ({ route, navigation }: any) => {
         'start_date': startDate.toISOString(),
         'end_date': endDate.toISOString(),
         'places': stageInfo.places,
-        'description': stageInfo.description,
-        
+        'description': stageInfo.description
     }
 
     const validationSchema = yup.object().shape({

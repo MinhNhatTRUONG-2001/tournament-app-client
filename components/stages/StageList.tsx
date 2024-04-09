@@ -37,6 +37,12 @@ const StageList = ({ navigation, token, tournamentId }: any) => {
                 .then(data => setStageList(data))
                 .catch(console.error)
         }
+        else {
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}`)
+                .then(response => response.json())
+                .then(data => setStageList(data))
+                .catch(console.error)
+        }
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stage_format`)
             .then(response => response.json())
             .then((data: any) => {
@@ -47,45 +53,40 @@ const StageList = ({ navigation, token, tournamentId }: any) => {
 
     return (
         <View style={styles.container}>
-            {token ?
-                <>
-                    {stageList ?
-                    <>
-                        {stageList.length > 1 &&
-                            <CustomButton
-                                buttonText="Change stage order"
-                                icon="menu"
-                                onPress={() => navigation.navigate("EditStageOrder", { navigation, token, tournamentId, stageList, setStageList })}
-                            />
-                        }
-                        <List.Section>
-                            {stageList.map((s: any) => {
-                                const stageFormat = stageFormats?.find(sf => sf.id === s.format_id)["name"]
-                                return <List.Item
-                                    key={s.id}
-                                    title={s.name}
-                                    description={stageFormat}
-                                    right={() => <List.Icon icon="chevron-right" />}
-                                    onPress={() => navigation.navigate("StageDetails", { navigation, token, stageId: s.id, stageList, setStageList })}
-                                    style={styles.item}
-                                />
-                            }
-                            )}
-                        </List.Section>
-                        <CustomButton
-                            buttonText="New stage"
-                            icon="plus"
-                            onPress={() => navigation.navigate("NewStage", { navigation, token, tournamentId, stageList, setStageList })}
+            {stageList ?
+                <List.Section>
+                    {stageList.map((s: any) => {
+                        const stageFormat = stageFormats?.find(sf => sf.id === s.format_id)["name"]
+                        return <List.Item
+                            key={s.id}
+                            title={s.name}
+                            description={stageFormat}
+                            right={() => <List.Icon icon="chevron-right" />}
+                            onPress={() => navigation.navigate("StageDetails", { navigation, token, stageId: s.id, stageList, setStageList })}
+                            style={styles.item}
                         />
-                    </>
-                        : <View style={styles.container2}>
-                            <Text>Loading...</Text>
-                        </View>
                     }
-                </>
+                    )}
+                </List.Section>
                 : <View style={styles.container2}>
-                    <Text>Please sign in to see your stage list of the tournament.</Text>
+                    <Text>Loading...</Text>
                 </View>
+            }
+            {(token && stageList) &&
+                <>
+                    {stageList.length > 1 &&
+                        <CustomButton
+                            buttonText="Change stage order"
+                            icon="menu"
+                            onPress={() => navigation.navigate("EditStageOrder", { navigation, token, tournamentId, stageList, setStageList })}
+                        />
+                    }
+                    <CustomButton
+                        buttonText="New stage"
+                        icon="plus"
+                        onPress={() => navigation.navigate("NewStage", { navigation, token, tournamentId, stageList, setStageList })}
+                    />
+                </>
             }
         </View>
     )

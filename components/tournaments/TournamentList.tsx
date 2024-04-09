@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { primary, tertiary } from "../../theme/colors";
-import { List, Text } from "react-native-paper";
+import { Divider, List, Searchbar, Text } from "react-native-paper";
 import CustomButton from "../custom/CustomButton";
 import { useEffect, useState } from "react";
 
@@ -24,18 +24,48 @@ const TournamentList = ({ navigation, token }: any) => {
             borderRadius: 5,
             padding: 5,
             margin: 5
-        }
+        },
+        text: {
+            alignSelf: 'center',
+            paddingTop: 10,
+            paddingBottom: 5
+        },
     });
 
     const [tournamentList, setTournamentList] = useState<any[]>()
+    const [searchTournamentList, setSearchTournamentList] = useState<string>('')
+    const [displayedTournamentList, setDisplayedTournamentList] = useState<any[]>()
+    const [publicTournamentList, setPublicTournamentList] = useState<any[]>()
+    const [searchPublicTournamentList, setSearchPublicTournamentList] = useState<string>('')
+    const [displayedPublicTournamentList, setDisplayedPublicTournamentList] = useState<any[]>()
+
+    const filterDisplayedTournamentList = (query: string) => {
+        setSearchTournamentList(query)
+        setDisplayedTournamentList(tournamentList?.filter(t => t.name.toLowerCase().includes(query.trim().toLowerCase())))
+    }
+
+    const filterDisplayedPublicTournamentList = (query: string) => {
+        setSearchPublicTournamentList(query)
+        setDisplayedPublicTournamentList(publicTournamentList?.filter(pt => pt.name.toLowerCase().includes(query.trim().toLowerCase())))
+    }
 
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/all/${token}`)
                 .then(response => response.json())
-                .then(data => setTournamentList(data))
+                .then(data => {
+                    setTournamentList(data)
+                    setDisplayedTournamentList(data)
+                })
                 .catch(console.error)
         }
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/public`)
+                .then(response => response.json())
+                .then(data => {
+                    setPublicTournamentList(data)
+                    setDisplayedPublicTournamentList(data)
+                })
+                .catch(console.error)
     }, [token])
 
     return (
@@ -44,17 +74,24 @@ const TournamentList = ({ navigation, token }: any) => {
                 {token ? (
                     tournamentList ? (
                         <>
-                            <List.Section>
-                                {tournamentList.map((t: any) => (
-                                    <List.Item
-                                        key={t.id}
-                                        title={t.name}
-                                        right={() => <List.Icon icon="chevron-right" />}
-                                        onPress={() => navigation.navigate("TournamentDetails", { navigation, token, id: t.id, tournamentList, setTournamentList })}
-                                        style={styles.item}
-                                    />
-                                ))}
-                            </List.Section>
+                            <Searchbar
+                                placeholder="Search"
+                                onChangeText={query => filterDisplayedTournamentList(query)}
+                                value={searchTournamentList}
+                            />
+                            {displayedTournamentList &&
+                                <List.Section>
+                                    {displayedTournamentList.map((t: any) => (
+                                        <List.Item
+                                            key={t.id}
+                                            title={t.name}
+                                            right={() => <List.Icon icon="chevron-right" />}
+                                            onPress={() => navigation.navigate("TournamentDetails", { navigation, token, tournamentId: t.id, tournamentList, setTournamentList })}
+                                            style={styles.item}
+                                        />
+                                    ))}
+                                </List.Section>
+                            }
                             <CustomButton
                                 buttonText="New tournament"
                                 icon="plus"
@@ -70,7 +107,29 @@ const TournamentList = ({ navigation, token }: any) => {
                     <View style={styles.container2}>
                         <Text>Please sign in to see your tournament list.</Text>
                     </View>
-                )}             
+                )}
+                <Divider />
+                <Text variant="titleMedium" style={styles.text}>
+                    All public tournaments
+                </Text>
+                <Searchbar
+                    placeholder="Search"
+                    onChangeText={query => filterDisplayedPublicTournamentList(query)}
+                    value={searchPublicTournamentList}
+                />
+                {displayedPublicTournamentList &&
+                    <List.Section>
+                        {displayedPublicTournamentList.map((t: any) => (
+                            <List.Item
+                                key={t.id}
+                                title={t.name}
+                                right={() => <List.Icon icon="chevron-right" />}
+                                onPress={() => navigation.navigate("TournamentDetails", { navigation, tournamentId: t.id })}
+                                style={styles.item}
+                            />
+                        ))}
+                    </List.Section>
+                }
             </ScrollView>
         </View>
     )

@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { Alert, Platform, ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary, tertiary } from "../../theme/colors";
@@ -8,6 +8,7 @@ import { Checkbox, Divider, Menu, Text, TextInput } from "react-native-paper";
 import { useEffect, useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
+import { stageFormatsEnum } from "../../data/stageFormatsEnum";
 
 const NewStage = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -72,7 +73,10 @@ const NewStage = ({ route, navigation }: any) => {
         'best_of_per_round': [],
         'include_third_place_match': false,
         'third_place_match_number_of_legs': 1,
-        'third_place_match_best_of': 0
+        'third_place_match_best_of': 0,
+        'win_point': 0,
+        'draw_point': 0,
+        'lose_point': 0
     }
 
     const validationSchema = yup.object().shape({
@@ -168,26 +172,29 @@ const NewStage = ({ route, navigation }: any) => {
             {
                 text: "OK",
                 onPress: () => {
-                    values["format_id"] = selectedStageFormatId
-                    values["number_of_teams_per_group"] = parseInt(values["number_of_teams_per_group"])
-                    values["number_of_groups"] = parseInt(values["number_of_groups"])
-                    values["stage_order"] = parseInt(values["stage_order"])
-                    for (var i = 0; i < values["number_of_legs_per_round"].length; i++) {
-                        values["number_of_legs_per_round"][i] = parseInt(values["number_of_legs_per_round"][i])
+                    var requestBody = { ...values }
+                    requestBody["format_id"] = selectedStageFormatId
+                    requestBody["number_of_teams_per_group"] = parseInt(requestBody["number_of_teams_per_group"])
+                    requestBody["number_of_groups"] = parseInt(requestBody["number_of_groups"])
+                    requestBody["stage_order"] = parseInt(requestBody["stage_order"])
+                    for (var i = 0; i < requestBody["number_of_legs_per_round"].length; i++) {
+                        requestBody["number_of_legs_per_round"][i] = parseInt(requestBody["number_of_legs_per_round"][i])
                     }
-                    for (var i = 0; i < values["best_of_per_round"].length; i++) {
-                        values["best_of_per_round"][i] = parseInt(values["best_of_per_round"][i])
+                    for (var i = 0; i < requestBody["best_of_per_round"].length; i++) {
+                        requestBody["best_of_per_round"][i] = parseInt(requestBody["best_of_per_round"][i])
                     }
-                    values["number_of_legs_per_round"]
-                    values["third_place_match_number_of_legs"] = parseInt(values["third_place_match_number_of_legs"])
-                    values["third_place_match_best_of"] = parseInt(values["third_place_match_best_of"])
-                    console.log(values)
+                    requestBody["third_place_match_number_of_legs"] = parseInt(requestBody["third_place_match_number_of_legs"])
+                    requestBody["third_place_match_best_of"] = parseInt(requestBody["third_place_match_best_of"])
+                    requestBody["win_point"] = parseInt(requestBody["win_point"]) || 0
+                    requestBody["draw_point"] = parseInt(requestBody["draw_point"]) || 0
+                    requestBody["lose_point"] = parseInt(requestBody["lose_point"]) || 0
+                    console.log(requestBody)
                     fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${token}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(values),
+                        body: JSON.stringify(requestBody),
                     })
                         .then(() => {
                             values["format_id"] = stageFormats?.find(sf => sf.id === selectedStageFormatId).name
@@ -283,6 +290,10 @@ const NewStage = ({ route, navigation }: any) => {
                                             {stageFormats?.map(s => <Menu.Item
                                                 onPress={() => {
                                                     values["format_id"] = s.name
+                                                    if (s.id !== selectedStageFormatId) {
+                                                        values["number_of_legs_per_round"] = []
+                                                        values["best_of_per_round"] = []
+                                                    }
                                                     setSelectedStageFormatId(s.id)
                                                     setShowFormatsMenu(false)
                                                 }}
@@ -308,7 +319,7 @@ const NewStage = ({ route, navigation }: any) => {
                                         inputMode="numeric"
                                         value={values.stage_order.toString()}
                                     />
-                                    {selectedStageFormatId == 1 &&
+                                    {selectedStageFormatId == stageFormatsEnum.SINGLE_ELIMINATION &&
                                         <>
                                             <Text style={styles.text}>Number of legs / round (max. 3)</Text>
                                             <FieldArray name="number_of_legs_per_round">
@@ -386,6 +397,52 @@ const NewStage = ({ route, navigation }: any) => {
                                                     />
                                                 </>
                                             )}
+                                        </>
+                                    }
+                                    {selectedStageFormatId === stageFormatsEnum.ROUND_ROBIN &&
+                                        <>
+                                            <Text style={styles.text}>Number of legs (max. 3)</Text>
+                                            <FieldArray name="number_of_legs_per_round">
+                                                {() =>
+                                                    <TextInput
+                                                        key={0}
+                                                        style={styles.text}
+                                                        inputMode="numeric"
+                                                        onChangeText={handleChange(`number_of_legs_per_round.${0}`)}
+                                                    />              
+                                                }
+                                            </FieldArray>
+                                            {(errors && errors.number_of_legs_per_round) && <Text style={styles.errorText}>{errors.number_of_legs_per_round}</Text>}
+                                            <Text style={styles.text}>Best of</Text>
+                                            <FieldArray name="best_of_per_round">
+                                                {() => 
+                                                    <TextInput
+                                                        key={0}
+                                                        style={styles.text}
+                                                        inputMode="numeric"
+                                                        onChangeText={handleChange(`best_of_per_round.${0}`)}
+                                                    />
+                                                }
+                                            </FieldArray>
+                                            {(errors && errors.best_of_per_round) && <Text style={styles.errorText}>{errors.best_of_per_round}</Text>}
+                                            <CustomTextInput
+                                                name="win_point"
+                                                label="Win Point"
+                                                keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
+                                                value={values.win_point.toString()}
+                                            />
+                                            <CustomTextInput
+                                                name="draw_point"
+                                                label="Draw Point"
+                                                keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
+                                                value={values.draw_point.toString()}
+                                            />
+                                            <CustomTextInput
+                                                name="lose_point"
+                                                label="Lose Point"
+                                                keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
+                                                value={values.lose_point.toString()}
+                                            />
                                         </>
                                     }
                                     <CustomButton buttonText="Create stage" onPress={handleSubmit} />

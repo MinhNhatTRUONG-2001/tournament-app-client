@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import CustomTextInput from "../custom/CustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
@@ -94,14 +94,14 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                 requestBody["team_1_scores"][i] = 0
             }
             else {
-                requestBody["team_1_scores"][i] = parseInt(requestBody["team_1_scores"][i])
+                requestBody["team_1_scores"][i] = parseInt(requestBody["team_1_scores"][i]) || 0
             }
         }
         for (var i = 0; i < requestBody["team_2_scores"].length; i++) {
             if (!requestBody["team_2_scores"][i]) {
                 requestBody["team_2_scores"][i] = 0;
             } else {
-                requestBody["team_2_scores"][i] = parseInt(requestBody["team_2_scores"][i]);
+                requestBody["team_2_scores"][i] = parseInt(requestBody["team_2_scores"][i]) || 0
             }
         }
         if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
@@ -116,7 +116,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                     requestBody["team_1_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_1_subscores"][i] = parseInt(requestBody["team_1_subscores"][i])
+                    requestBody["team_1_subscores"][i] = parseInt(requestBody["team_1_subscores"][i]) || 0
                 }
             }
             for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
@@ -124,7 +124,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                     requestBody["team_2_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_2_subscores"][i] = parseInt(requestBody["team_2_subscores"][i])
+                    requestBody["team_2_subscores"][i] = parseInt(requestBody["team_2_subscores"][i]) || 0
                 }
             }
         }
@@ -160,7 +160,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
     return (
         <Formik initialValues={initialValues} onSubmit={updateMatchScores}>
             {
-                ({ handleSubmit, values, handleChange, errors }) =>
+                ({ handleSubmit, values, handleChange }) =>
                     <View style={styles.container}>
                         <ScrollView>
                             <Menu
@@ -195,7 +195,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                 <TextInput
                                                     key={index}
                                                     style={styles.text}
-                                                    inputMode="numeric"
+                                                    keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                     onChangeText={(text) => {
                                                         handleChange(`team_1_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
@@ -217,7 +217,6 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                     </ScrollView>
                                 )}
                             </FieldArray>
-                            {(errors && errors.team_1_scores) && <Text style={styles.errorText}>{errors.team_1_scores}</Text>}
                             <Text style={styles.text}>{matchInfo.team_2} Scores</Text>
                             <FieldArray name="team_2_scores">
                                 {() => (
@@ -228,7 +227,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                 <TextInput
                                                     key={index}
                                                     style={styles.text}
-                                                    inputMode="numeric"
+                                                    keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                     onChangeText={(text) => {
                                                         handleChange(`team_2_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
@@ -250,7 +249,6 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                     </ScrollView>
                                 )}
                             </FieldArray>
-                            {(errors && errors.team_2_scores) && <Text style={styles.errorText}>{errors.team_2_scores}</Text>}
                             {matchInfo.best_of > 0 &&
                                 <>
                                     <Text style={styles.text}>{matchInfo.team_1} Subscores</Text>
@@ -265,7 +263,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                                 <TextInput
                                                                     key={innerIndex}
                                                                     style={styles.text}
-                                                                    inputMode="numeric"
+                                                                    keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_1_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
                                                                     placeholder={`Leg ${outerIndex + 1}, Subscore ${innerIndex + 1}`}
@@ -277,7 +275,6 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                             </>
                                         )}
                                     </FieldArray>
-                                    {(errors && errors.team_1_subscores) && <Text style={styles.errorText}>{errors.team_1_subscores.toString()}</Text>}
                                     <Text style={styles.text}>{matchInfo.team_2} Subscores</Text>
                                     <FieldArray name="team_2_subscores">
                                         {() => (
@@ -290,7 +287,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                                 <TextInput
                                                                     key={innerIndex}
                                                                     style={styles.text}
-                                                                    inputMode="numeric"
+                                                                    keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_2_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
                                                                     placeholder={`Subscore ${innerIndex + 1}`}
@@ -302,7 +299,6 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                             </>
                                         )}
                                     </FieldArray>
-                                    {(errors && errors.team_2_subscores) && <Text style={styles.errorText}>{errors.team_2_subscores.toString()}</Text>}
                                 </>
                             }
                             <CustomButton buttonText="Update" onPress={handleSubmit} />

@@ -23,13 +23,19 @@ const TournamentDetails = ({ route, navigation }: any) => {
     });
 
     const { token } = route.params
-    const { id } = route.params
+    const { tournamentId } = route.params
     const { tournamentList } = route.params
     const { setTournamentList } = route.params
     const [tournamentInfo, setTournamentInfo] = useState<any>()
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${id}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}/${token}`)
+                .then(response => response.json())
+                .then(data => setTournamentInfo(data))
+                .catch(console.error)
+        }
+        else {
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}`)
                 .then(response => response.json())
                 .then(data => setTournamentInfo(data))
                 .catch(console.error)
@@ -52,7 +58,7 @@ const TournamentDetails = ({ route, navigation }: any) => {
                 <StageList
                     navigation={navigation}
                     token={token}
-                    tournamentId={id}
+                    tournamentId={tournamentId}
                 />
             </ScrollView>
         </View>

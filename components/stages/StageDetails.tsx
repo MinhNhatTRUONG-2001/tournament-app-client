@@ -3,7 +3,9 @@ import { primary } from "../../theme/colors";
 import { Divider, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
 import StageInfo from "./StageInfo";
-import MatchesSe from "../matches_se/MatchListSE";
+import MatchListSE from "../matches_se/MatchListSE";
+import MatchListRR from "../matches_rr/MatchListRR";
+import { stageFormatsEnum } from "../../data/stageFormatsEnum";
 
 const StageDetails = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -34,6 +36,12 @@ const StageDetails = ({ route, navigation }: any) => {
                 .then(data => setStageInfo(data))
                 .catch(console.error)
         }
+        else {
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageId}`)
+                .then(response => response.json())
+                .then(data => setStageInfo(data))
+                .catch(console.error)
+        }
     }, [])
 
     return (
@@ -50,12 +58,19 @@ const StageDetails = ({ route, navigation }: any) => {
                         setStageInfo={setStageInfo}/>
                     <Divider />
                     <Text variant="titleMedium" style={styles.text}>Matches</Text>
-                    {stageInfo.format_id === 1 &&
-                        <MatchesSe
+                    {stageInfo.format_id === stageFormatsEnum.SINGLE_ELIMINATION &&
+                        <MatchListSE
                             navigation={navigation}
                             token={token}
                             stageId={stageId}
                             includeThirdPlaceMatch={stageInfo.include_third_place_match}
+                        />
+                    }
+                    {stageInfo.format_id === stageFormatsEnum.ROUND_ROBIN &&
+                        <MatchListRR
+                            navigation={navigation}
+                            token={token}
+                            stageId={stageId}
                         />
                     }
                 </ScrollView>
