@@ -30,13 +30,23 @@ const TournamentDetails = ({ route, navigation }: any) => {
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}/${token}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setTournamentInfo(data))
                 .catch(console.error)
         }
         else {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setTournamentInfo(data))
                 .catch(console.error)
         }
@@ -52,7 +62,7 @@ const TournamentDetails = ({ route, navigation }: any) => {
                     tournamentList={tournamentList}
                     setTournamentList={setTournamentList}
                     tournamentInfo={tournamentInfo}
-                    setTournamentInfo={setTournamentInfo}/>
+                    setTournamentInfo={setTournamentInfo} />
                 <Divider />
                 <Text variant="titleMedium" style={styles.text}>Stage list</Text>
                 <StageList

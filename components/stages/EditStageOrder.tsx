@@ -37,7 +37,7 @@ const EditStageOrder = ({ route, navigation }: any) => {
     const { setStageList } = route.params
     const [temporaryStageList, setTemporaryStageList] = useState<any[]>(stageList)
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
+
     const handleInputChange = (index: number, value: string) => {
         const updatedStageList = [...temporaryStageList]
         updatedStageList[index] = { ...updatedStageList[index], stage_order: parseInt(value, 10) || 0 }
@@ -56,26 +56,26 @@ const EditStageOrder = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(requestBody),
         })
-        .then(async response => {
-            if (response.ok) {
-                return response.json()
-            }
-            else throw new Error(await response.text())
-        })
-        .then(() => {
-            temporaryStageList.sort((a, b) => a.stage_order - b.stage_order);
-            setStageList(temporaryStageList)
-            navigation.goBack()
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(() => {
+                temporaryStageList.sort((a, b) => a.stage_order - b.stage_order);
+                setStageList(temporaryStageList)
+                navigation.goBack()
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (
         <View style={styles.container}>
             <ScrollView>
-                {temporaryStageList.map((stage, index) => 
+                {temporaryStageList.map((stage, index) =>
                     <View style={styles.container2}>
                         <TextInput
                             style={styles.textInput}

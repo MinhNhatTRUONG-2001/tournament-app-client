@@ -64,15 +64,15 @@ const Profile = ({ navigation, token, setToken }: any) => {
     return (
         <View style={styles.container}>
             {token && userInfo
-            ? <ScrollView>
-                <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
-                <Text variant="titleLarge"  style={styles.text}>{userInfo.username}</Text>
-                <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo}/>
-                <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
-            </ScrollView>
-            : <ScrollView>
-                <SignIn navigation={navigation} setToken={setToken} />
-            </ScrollView>}
+                ? <ScrollView>
+                    <Text variant="titleMedium" style={styles.text}>You are signed in as: </Text>
+                    <Text variant="titleLarge" style={styles.text}>{userInfo.username}</Text>
+                    <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo} />
+                    <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
+                </ScrollView>
+                : <ScrollView>
+                    <SignIn navigation={navigation} setToken={setToken} />
+                </ScrollView>}
         </View>
     )
 }

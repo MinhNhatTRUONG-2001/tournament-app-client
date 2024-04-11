@@ -33,18 +33,33 @@ const StageList = ({ navigation, token, tournamentId }: any) => {
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}/${token}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setStageList(data))
                 .catch(console.error)
         }
         else {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setStageList(data))
                 .catch(console.error)
         }
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stage_format`)
-            .then(response => response.json())
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
             .then((data: any) => {
                 setStageFormats(data)
             })

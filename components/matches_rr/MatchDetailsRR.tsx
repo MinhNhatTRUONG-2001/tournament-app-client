@@ -23,17 +23,27 @@ const MatchDetailsRR = ({ route, navigation }: any) => {
     const { matchList } = route.params
     const { setMatchList } = route.params
     const [matchInfo, setMatchInfo] = useState<any>()
-    
+
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}/${token}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setMatchInfo(data))
                 .catch(console.error)
         }
         else {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setMatchInfo(data))
                 .catch(console.error)
         }
@@ -42,7 +52,7 @@ const MatchDetailsRR = ({ route, navigation }: any) => {
     return (
         <View style={styles.container}>
             {matchInfo &&
-                <ScrollView> 
+                <ScrollView>
                     <MatchInfoRR matchInfo={matchInfo} />
                     <Divider />
                     {token &&

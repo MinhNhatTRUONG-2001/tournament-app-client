@@ -89,7 +89,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                 }
             }
         }
-        console.log(requestBody)
+        //console.log(requestBody)
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchInfo.id}/match_score/${token}`, {
             method: 'PUT',
             headers: {
@@ -97,25 +97,30 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(requestBody),
         })
-        .then(async response => {
-            if (response.ok) {
-                return response.json()
-            }
-            else throw new Error(await response.text())
-        })
-        .then(data => {
-            setMatchInfo(data)
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${matchInfo.stage_id}/${token}`)
-                .then(response => response.json())
-                .then(data2 => {
-                    setMatchList(data2)
-                    navigation.goBack()
-                })
-                .catch(console.error)
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setMatchInfo(data)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${matchInfo.stage_id}/${token}`)
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json()
+                        }
+                        else throw new Error(await response.text())
+                    })
+                    .then(data2 => {
+                        setMatchList(data2)
+                        navigation.goBack()
+                    })
+                    .catch(console.error)
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (

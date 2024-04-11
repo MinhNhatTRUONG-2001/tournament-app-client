@@ -63,7 +63,7 @@ const NewTournament = ({ route, navigation }: any) => {
             .required("Name is required"),
         start_date: yup
             .date()
-            .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
+            .test('is-before-end-date', 'Start date must be before or equal to end date', function (value) {
                 const { end_date } = this.parent
                 const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
                 return isBeforeEndDate
@@ -100,14 +100,19 @@ const NewTournament = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(values),
         })
-        .then(response => response.json())
-        .then((data: any) => {
-            setTournamentList([...tournamentList, data])
-            navigation.navigate('TournamentList')
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then((data: any) => {
+                setTournamentList([...tournamentList, data])
+                navigation.navigate('TournamentList')
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (

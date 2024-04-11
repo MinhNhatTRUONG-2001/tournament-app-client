@@ -73,34 +73,39 @@ const ChangeUserInfo = ({ token }: any) => {
             },
             body: JSON.stringify(request_body),
         })
-        .then(response => response.json())
-        .then(async data => {
-            if (data.isSuccess) {
-                setErrorMessage('')
-                setUserInfoCallback({
-                    ...userInfo,
-                    username: values["username"],
-                    country: values["country"],
-                    phone: values["phone"],
-                    can_change_username: false
-                })
-                Alert.alert(data.message)
-            }
-            else {
-                setErrorMessage(data.message)
-            }
-        })
-        .catch(console.error)
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(async data => {
+                if (data.isSuccess) {
+                    setErrorMessage('')
+                    setUserInfoCallback({
+                        ...userInfo,
+                        username: values["username"],
+                        country: values["country"],
+                        phone: values["phone"],
+                        can_change_username: false
+                    })
+                    Alert.alert(data.message)
+                }
+                else {
+                    setErrorMessage(data.message)
+                }
+            })
+            .catch(console.error)
         setDisabledSubmitButton(false)
     }
-    
+
     return (
         <Formik initialValues={initialValues} onSubmit={handleChangingUserInfo} validationSchema={validationSchema}>
             {
                 ({ handleSubmit, values }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="id" label="User ID" disabled={true}/>
+                            <CustomTextInput name="id" label="User ID" disabled={true} />
                             <CustomTextInput name="username" label="Username" disabled={!userInfo.can_change_username} />
                             {!userInfo.can_change_username && <Text style={styles.errorText}>
                                 Username cannot be changed within 30 days since last change.
@@ -110,10 +115,10 @@ const ChangeUserInfo = ({ token }: any) => {
                             <Menu
                                 visible={showCountriesMenu}
                                 onDismiss={() => setShowCountriesMenu(false)}
-                                anchor={<CustomTextInput name="country" label="Country" editable={false} onPressIn={() => setShowCountriesMenu(true)}/>}
+                                anchor={<CustomTextInput name="country" label="Country" editable={false} onPressIn={() => setShowCountriesMenu(true)} />}
                             >
                                 <ScrollView>
-                                    {countryNames.map(cn => <Menu.Item 
+                                    {countryNames.map(cn => <Menu.Item
                                         onPress={() => {
                                             values["country"] = cn
                                             setShowCountriesMenu(false)

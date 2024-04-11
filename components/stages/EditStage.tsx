@@ -47,7 +47,7 @@ const EditStage = ({ route, navigation }: any) => {
     const [startDate, setStartDate] = useState(new Date(stageInfo.start_date))
     const [endDate, setEndDate] = useState(new Date(stageInfo.end_date))
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
+
     const initialValues = {
         'name': stageInfo.name,
         'tournament_id': stageInfo.tournament_id,
@@ -64,7 +64,7 @@ const EditStage = ({ route, navigation }: any) => {
             .required("Name is required"),
         start_date: yup
             .date()
-            .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
+            .test('is-before-end-date', 'Start date must be before or equal to end date', function (value) {
                 const { end_date } = this.parent
                 const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
                 return isBeforeEndDate
@@ -101,15 +101,20 @@ const EditStage = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(values),
         })
-        .then(response => response.json())
-        .then(data => {
-            setStageList(stageList.map((s: any) => s.id === stageInfo.id ? data : s))
-            setStageInfo(data)
-            navigation.goBack()
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setStageList(stageList.map((s: any) => s.id === stageInfo.id ? data : s))
+                setStageInfo(data)
+                navigation.goBack()
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (

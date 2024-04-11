@@ -32,13 +32,23 @@ const StageDetails = ({ route, navigation }: any) => {
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageId}/${token}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setStageInfo(data))
                 .catch(console.error)
         }
         else {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageId}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => setStageInfo(data))
                 .catch(console.error)
         }
@@ -55,7 +65,7 @@ const StageDetails = ({ route, navigation }: any) => {
                         stageList={stageList}
                         setStageList={setStageList}
                         stageInfo={stageInfo}
-                        setStageInfo={setStageInfo}/>
+                        setStageInfo={setStageInfo} />
                     <Divider />
                     <Text variant="titleMedium" style={styles.text}>Matches</Text>
                     {stageInfo.format_id === stageFormatsEnum.SINGLE_ELIMINATION &&

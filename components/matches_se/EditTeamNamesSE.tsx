@@ -26,7 +26,7 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
     const { matchInfo } = route.params
     const { setMatchInfo } = route.params
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
+
     const initialValues = {
         'team_1': matchInfo.team_1,
         'team_2': matchInfo.team_2,
@@ -41,7 +41,7 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
             .max(100, "The maximum characters is 100")
     })
 
-    const updateStage = (values: any) => {
+    const updateTeamNames = (values: any) => {
         //console.log(values)
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/team_name/${token}`, {
             method: 'PUT',
@@ -50,28 +50,34 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(values),
         })
-        .then(async response => {
-            if (response.ok) {
-                return response.json()
-            }
-            else throw new Error(await response.text())
-        })
-        .then(data => {
-            setMatchInfo(data)
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${data.stage_id}/${token}`)
-            .then(response2 => response2.json())
-            .then(data2 => {
-                setMatchList(data2)
-                navigation.goBack()
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
             })
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(data => {
+                setMatchInfo(data)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${data.stage_id}/${token}`)
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json()
+                        }
+                        else throw new Error(await response.text())
+                    })
+                    .then(data2 => {
+                        setMatchList(data2)
+                        navigation.goBack()
+                    })
+                    .catch(console.error)
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (
-        <Formik initialValues={initialValues} onSubmit={updateStage} validationSchema={validationSchema}>
+        <Formik initialValues={initialValues} onSubmit={updateTeamNames} validationSchema={validationSchema}>
             {
                 ({ handleSubmit }) =>
                     <View style={styles.container}>

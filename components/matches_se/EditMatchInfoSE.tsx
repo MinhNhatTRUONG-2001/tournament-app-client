@@ -20,7 +20,7 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
             flexDirection: 'row',
         },
         datetimeContainer: {
-            justifyContent:'center',
+            justifyContent: 'center',
             flexDirection: 'row',
         },
         text: {
@@ -46,7 +46,7 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
     const { setMatchInfo } = route.params
     const [startDatetime, setStartDatetime] = useState(matchInfo.start_datetime ? new Date(matchInfo.start_datetime) : (new Date(Date.now())))
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
-    
+
     const initialValues = {
         'start_datetime': startDatetime.toISOString(),
         'place': matchInfo.place,
@@ -74,15 +74,20 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(values),
         })
-        .then(response => response.json())
-        .then(data => {
-            setMatchList(matchList.map((m: any) => m.id === matchInfo.id ? data : m))
-            setMatchInfo(data)
-            navigation.goBack()
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setMatchList(matchList.map((m: any) => m.id === matchInfo.id ? data : m))
+                setMatchInfo(data)
+                navigation.goBack()
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (

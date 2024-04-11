@@ -49,7 +49,7 @@ const MatchInfoSE = ({ matchInfo }: any) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.keyText}>Group: 
+            <Text style={styles.keyText}>Group:
                 <Text style={styles.valueText}> {matchInfo.group_number}</Text>
             </Text>
             <Text style={styles.keyText}>Round:
@@ -101,7 +101,7 @@ const MatchInfoSE = ({ matchInfo }: any) => {
                                     </DataTable.Row>
                                 </DataTable>
                             </ScrollView>
-                        } 
+                        }
                     </>
                 )
             }

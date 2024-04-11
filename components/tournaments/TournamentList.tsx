@@ -52,7 +52,12 @@ const TournamentList = ({ navigation, token }: any) => {
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/all/${token}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => {
                     setTournamentList(data)
                     setDisplayedTournamentList(data)
@@ -60,12 +65,17 @@ const TournamentList = ({ navigation, token }: any) => {
                 .catch(console.error)
         }
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/public`)
-                .then(response => response.json())
-                .then(data => {
-                    setPublicTournamentList(data)
-                    setDisplayedPublicTournamentList(data)
-                })
-                .catch(console.error)
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setPublicTournamentList(data)
+                setDisplayedPublicTournamentList(data)
+            })
+            .catch(console.error)
     }, [token])
 
     return (

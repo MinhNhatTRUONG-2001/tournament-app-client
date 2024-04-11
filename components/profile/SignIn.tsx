@@ -59,7 +59,12 @@ const SignIn = ({ navigation, setToken }: any) => {
             },
             body: JSON.stringify(values),
         })
-            .then(response => response.json())
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
             .then(async data => {
                 if (data.isSuccess) {
                     setErrorMessage('')
@@ -72,7 +77,7 @@ const SignIn = ({ navigation, setToken }: any) => {
                 }
             })
             .catch(console.error)
-            setDisabledSubmitButton(false)
+        setDisabledSubmitButton(false)
     }
 
     return (
@@ -90,12 +95,12 @@ const SignIn = ({ navigation, setToken }: any) => {
                                 label="Show password"
                                 labelStyle={{ textAlign: 'left' }}
                                 status={showPassword ? 'checked' : 'unchecked'}
-                                onPress={() => {setShowPassword(!showPassword)}}
+                                onPress={() => { setShowPassword(!showPassword) }}
                                 color={tertiary}
                                 position="leading"
                                 mode="android"
                             />
-                            <CustomButton buttonText="Sign in" onPress={handleSubmit} disabled={disabledSubmitButton}/>
+                            <CustomButton buttonText="Sign in" onPress={handleSubmit} disabled={disabledSubmitButton} />
                             <Text style={styles.errorText}>{errorMessage}</Text>
                         </>
                 }

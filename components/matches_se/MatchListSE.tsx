@@ -3,7 +3,7 @@ import { primary, secondary } from "../../theme/colors";
 import { useEffect, useState } from "react";
 import { DataTable, SegmentedButtons } from "react-native-paper";
 
-const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch  }: any) => {
+const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -29,26 +29,36 @@ const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch  }: an
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${stageId}/${token}`)
-            .then(response => response.json())
-            .then(data => {
-                setMatchList(data)
-                var groupNumberArray: any[] = [], roundNumberArray: any[] = []
-                groupNumberArray = Array.from(new Set(data.map((match: any) => match.group_number))).sort()
-                roundNumberArray = Array.from(new Set(data.map((match: any) => match.round_number))).sort()
-                var groupNumberButtonPropertiesObject: any[] = [], roundNumberButtonPropertiesObject: any[] = []
-                groupNumberArray.map((n) => groupNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Group ' + n }))
-                roundNumberArray.map((n) => roundNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Round ' + n }))
-                if (includeThirdPlaceMatch) {
-                    roundNumberButtonPropertiesObject[roundNumberArray.length - 1].label = "3rd Place"
-                }
-                setGroupNumberButtonProperties(groupNumberButtonPropertiesObject)
-                setRoundNumberButtonProperties(roundNumberButtonPropertiesObject)
-            })
-            .catch(console.error)
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
+                .then(data => {
+                    setMatchList(data)
+                    var groupNumberArray: any[] = [], roundNumberArray: any[] = []
+                    groupNumberArray = Array.from(new Set(data.map((match: any) => match.group_number))).sort()
+                    roundNumberArray = Array.from(new Set(data.map((match: any) => match.round_number))).sort()
+                    var groupNumberButtonPropertiesObject: any[] = [], roundNumberButtonPropertiesObject: any[] = []
+                    groupNumberArray.map((n) => groupNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Group ' + n }))
+                    roundNumberArray.map((n) => roundNumberButtonPropertiesObject.push({ value: n.toString(), label: 'Round ' + n }))
+                    if (includeThirdPlaceMatch) {
+                        roundNumberButtonPropertiesObject[roundNumberArray.length - 1].label = "3rd Place"
+                    }
+                    setGroupNumberButtonProperties(groupNumberButtonPropertiesObject)
+                    setRoundNumberButtonProperties(roundNumberButtonPropertiesObject)
+                })
+                .catch(console.error)
         }
         else {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${stageId}`)
-                .then(response => response.json())
+                .then(async response => {
+                    if (response.ok) {
+                        return response.json()
+                    }
+                    else throw new Error(await response.text())
+                })
                 .then(data => {
                     setMatchList(data)
                     var groupNumberArray: any[] = [], roundNumberArray: any[] = []

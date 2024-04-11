@@ -65,7 +65,7 @@ const EditTournament = ({ route, navigation }: any) => {
             .required("Name is required"),
         start_date: yup
             .date()
-            .test('is-before-end-date', 'Start date must be before or equal to end date', function(value) {
+            .test('is-before-end-date', 'Start date must be before or equal to end date', function (value) {
                 const { end_date } = this.parent
                 const isBeforeEndDate = moment(value).isSameOrBefore(end_date)
                 return isBeforeEndDate
@@ -102,15 +102,20 @@ const EditTournament = ({ route, navigation }: any) => {
             },
             body: JSON.stringify(values),
         })
-        .then(response => response.json())
-        .then(data => {
-            setTournamentList(tournamentList.map((t: any) => t.id === tournamentInfo.id ? data : t))
-            setTournamentInfo(data)
-            navigation.goBack()
-        })
-        .catch((error: any) => {
-            setServerErrorMessage(error.message)
-        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setTournamentList(tournamentList.map((t: any) => t.id === tournamentInfo.id ? data : t))
+                setTournamentInfo(data)
+                navigation.goBack()
+            })
+            .catch((error: any) => {
+                setServerErrorMessage(error.message)
+            })
     }
 
     return (

@@ -66,21 +66,26 @@ const ChangePassword = ({ token }: any) => {
             },
             body: JSON.stringify(request_body),
         })
-        .then(response => response.json())
-        .then(async data => {
-            if (data.isSuccess) {
-                setErrorMessage('')
-                Alert.alert(data.message)
-                resetForm()
-            }
-            else {
-                setErrorMessage(data.message)
-            }
-        })
-        .catch(console.error)
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(async data => {
+                if (data.isSuccess) {
+                    setErrorMessage('')
+                    Alert.alert(data.message)
+                    resetForm()
+                }
+                else {
+                    setErrorMessage(data.message)
+                }
+            })
+            .catch(console.error)
         setDisabledSubmitButton(false)
     }
-    
+
     return (
         <Formik initialValues={initialValues} onSubmit={handleChangingPassword} validationSchema={validationSchema}>
             {
@@ -94,7 +99,7 @@ const ChangePassword = ({ token }: any) => {
                                 label="Show password"
                                 labelStyle={{ textAlign: 'left' }}
                                 status={showPassword ? 'checked' : 'unchecked'}
-                                onPress={() => {setShowPassword(!showPassword)}}
+                                onPress={() => { setShowPassword(!showPassword) }}
                                 color={tertiary}
                                 position="leading"
                                 mode="android"

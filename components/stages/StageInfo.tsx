@@ -41,13 +41,13 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
             (input: string) => {
                 if (input.trim() === stageInfo.name) {
                     fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}/${token}`, { method: 'DELETE' })
-                    .then(() => {
-                        setStageList(stageList.filter((t: any) => t.id !== stageInfo.id))
-                        navigation.goBack()
-                    })
-                    .catch((error: any) => {
-                        setServerErrorMessage(error.message)
-                    })
+                        .then(() => {
+                            setStageList(stageList.filter((t: any) => t.id !== stageInfo.id))
+                            navigation.goBack()
+                        })
+                        .catch((error: any) => {
+                            setServerErrorMessage(error.message)
+                        })
                 }
                 else {
                     Alert.alert("Error", "The input is not correct")
@@ -57,7 +57,12 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
 
     useEffect(() => {
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stage_format/${stageInfo.format_id}`)
-            .then(response => response.json())
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
             .then((data) => {
                 setStageFormat(data.name)
             })

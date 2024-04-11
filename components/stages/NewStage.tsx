@@ -188,7 +188,7 @@ const NewStage = ({ route, navigation }: any) => {
                     requestBody["win_point"] = parseInt(requestBody["win_point"]) || 0
                     requestBody["draw_point"] = parseInt(requestBody["draw_point"]) || 0
                     requestBody["lose_point"] = parseInt(requestBody["lose_point"]) || 0
-                    console.log(requestBody)
+                    //console.log(requestBody)
                     fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${token}`, {
                         method: 'POST',
                         headers: {
@@ -199,7 +199,12 @@ const NewStage = ({ route, navigation }: any) => {
                         .then(() => {
                             values["format_id"] = stageFormats?.find(sf => sf.id === selectedStageFormatId).name
                             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}/${token}`)
-                                .then(response => response.json())
+                                .then(async response => {
+                                    if (response.ok) {
+                                        return response.json()
+                                    }
+                                    else throw new Error(await response.text())
+                                })
                                 .then(data2 => {
                                     setStageList(data2)
                                     navigation.goBack()
@@ -209,14 +214,20 @@ const NewStage = ({ route, navigation }: any) => {
                         .catch((error: any) => {
                             setServerErrorMessage(error.message)
                         })
-            }},
+                }
+            },
             { text: "Cancel", style: 'cancel' }
-        ])  
+        ])
     }
 
     useEffect(() => {
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stage_format`)
-            .then(response => response.json())
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
             .then((data: any) => {
                 setStageFormats(data)
             })
@@ -409,13 +420,13 @@ const NewStage = ({ route, navigation }: any) => {
                                                         style={styles.text}
                                                         inputMode="numeric"
                                                         onChangeText={handleChange(`number_of_legs_per_round.${0}`)}
-                                                    />              
+                                                    />
                                                 }
                                             </FieldArray>
                                             {(errors && errors.number_of_legs_per_round) && <Text style={styles.errorText}>{errors.number_of_legs_per_round}</Text>}
                                             <Text style={styles.text}>Best of</Text>
                                             <FieldArray name="best_of_per_round">
-                                                {() => 
+                                                {() =>
                                                     <TextInput
                                                         key={0}
                                                         style={styles.text}

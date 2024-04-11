@@ -46,22 +46,27 @@ const ForgotPassword = () => {
         fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/forgot_password", {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
         })
-        .then(response => response.json())
-        .then(async data => {
-            if (data.isSuccess) {
-                setErrorMessage('')
-                Alert.alert(data.message)
-                resetForm()
-            }
-            else {
-                setErrorMessage(data.message)
-            }
-        })
-        .catch(console.error)
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(async data => {
+                if (data.isSuccess) {
+                    setErrorMessage('')
+                    Alert.alert(data.message)
+                    resetForm()
+                }
+                else {
+                    setErrorMessage(data.message)
+                }
+            })
+            .catch(console.error)
         setDisabledSubmitButton(false)
     }
 
