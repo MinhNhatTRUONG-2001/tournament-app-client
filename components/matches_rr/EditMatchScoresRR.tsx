@@ -44,10 +44,11 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
     });
 
     const { token } = route.params
-    const { matchList } = route.params
+    const { stageInfo } = route.params
     const { setMatchList } = route.params
     const { matchInfo } = route.params
     const { setMatchInfo } = route.params
+    const { setTableResults } = route.params
     const [showTeamsMenu, setShowTeamsMenu] = useState<boolean>(false)
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
 
@@ -57,6 +58,8 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
         'team_2_score': matchInfo.team_2_score,
         'team_1_subscores': matchInfo.team_1_subscores,
         'team_2_subscores': matchInfo.team_2_subscores,
+        'team_1_other_criteria_values': matchInfo.team_1_other_criteria_values,
+        'team_2_other_criteria_values': matchInfo.team_2_other_criteria_values
     }
 
     const updateMatchScores = (values: any) => {
@@ -64,8 +67,8 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
         if (requestBody["winner"] === "") {
             requestBody["winner"] = null
         }
-        requestBody["team_1_score"] = parseInt(requestBody["team_1_score"]) || 0
-        requestBody["team_2_score"] = parseInt(requestBody["team_2_score"]) || 0
+        requestBody["team_1_score"] = parseFloat(requestBody["team_1_score"]) || 0
+        requestBody["team_2_score"] = parseFloat(requestBody["team_2_score"]) || 0
 
         if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
             requestBody["team_1_subscores"] = null
@@ -77,7 +80,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                     requestBody["team_1_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_1_subscores"][i] = parseInt(requestBody["team_1_subscores"][i]) || 0
+                    requestBody["team_1_subscores"][i] = parseFloat(requestBody["team_1_subscores"][i]) || 0
                 }
             }
             for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
@@ -85,15 +88,16 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                     requestBody["team_2_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_2_subscores"][i] = parseInt(requestBody["team_2_subscores"][i]) || 0
+                    requestBody["team_2_subscores"][i] = parseFloat(requestBody["team_2_subscores"][i]) || 0
                 }
             }
         }
         //console.log(requestBody)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchInfo.id}/match_score/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchInfo.id}/match_score`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(requestBody),
         })
@@ -105,7 +109,11 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
             })
             .then(data => {
                 setMatchInfo(data)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${matchInfo.stage_id}/${token}`)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${matchInfo.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
                     .then(async response => {
                         if (response.ok) {
                             return response.json()
@@ -115,6 +123,21 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                     .then(data2 => {
                         setMatchList(data2)
                         navigation.goBack()
+                    })
+                    .catch(console.error)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${matchInfo.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json()
+                        }
+                        else throw new Error(await response.text())
+                    })
+                    .then(data => {
+                        setTableResults(data)
                     })
                     .catch(console.error)
             })
@@ -176,7 +199,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_1_subscores.${index}`)}
                                                         value={value.toString()}
-                                                        placeholder={`Subscore ${index + 1}`}
+                                                        label={`Subscore ${index + 1}`}
                                                     />
                                                 ))}
                                             </ScrollView>
@@ -193,7 +216,45 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_2_subscores.${index}`)}
                                                         value={value.toString()}
-                                                        placeholder={`Subscore ${index + 1}`}
+                                                        label={`Subscore ${index + 1}`}
+                                                    />
+                                                ))}
+                                            </ScrollView>
+                                        )}
+                                    </FieldArray>
+                                </>
+                            }
+                            {stageInfo.other_criteria_names &&
+                                <>
+                                    <Text style={styles.text}>{matchInfo.team_1} other criteria values</Text>
+                                    <FieldArray name="team_1_other_criteria_values">
+                                        {() => (
+                                            <ScrollView horizontal>
+                                                {values.team_1_other_criteria_values?.map((value: any, index: number) => (
+                                                    <TextInput
+                                                        key={index}
+                                                        style={styles.text}
+                                                        keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
+                                                        onChangeText={handleChange(`team_1_other_criteria_values.${index}`)}
+                                                        value={value.toString()}
+                                                        label={stageInfo.other_criteria_names[index]}
+                                                    />
+                                                ))}
+                                            </ScrollView>
+                                        )}
+                                    </FieldArray>
+                                    <Text style={styles.text}>{matchInfo.team_2} other criteria values</Text>
+                                    <FieldArray name="team_2_other_criteria_values">
+                                        {() => (
+                                            <ScrollView horizontal>
+                                                {values.team_2_other_criteria_values?.map((value: any, index: number) => (
+                                                    <TextInput
+                                                        key={index}
+                                                        style={styles.text}
+                                                        keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
+                                                        onChangeText={handleChange(`team_2_other_criteria_values.${index}`)}
+                                                        value={value.toString()}
+                                                        label={stageInfo.other_criteria_names[index]}
                                                     />
                                                 ))}
                                             </ScrollView>

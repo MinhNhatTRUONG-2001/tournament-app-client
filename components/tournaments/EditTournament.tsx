@@ -95,10 +95,11 @@ const EditTournament = ({ route, navigation }: any) => {
 
     const updateTournament = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(values),
         })
@@ -149,7 +150,7 @@ const EditTournament = ({ route, navigation }: any) => {
                                                 <TextInput
                                                     onChangeText={handleChange(`places.${index}`)}
                                                     value={item}
-                                                    placeholder="Place"
+                                                    label="Place"
                                                 />
                                                 <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                             </View>

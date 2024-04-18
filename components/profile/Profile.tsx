@@ -1,5 +1,5 @@
-import { ScrollView, StyleSheet, View } from "react-native";
-import { primary } from "../../theme/colors";
+import { Alert, ScrollView, StyleSheet, View } from "react-native";
+import { error, primary } from "../../theme/colors";
 import SignIn from "./SignIn";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
@@ -20,46 +20,77 @@ const Profile = ({ navigation, token, setToken }: any) => {
         }
     });
 
-    const [userInfo, setUserInfo] = useState<any | undefined>(undefined);
+    const [userInfo, setUserInfo] = useState<any | undefined>(undefined)
 
     const getUserInformation = async () => {
         try {
             const response = await fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/get_user_information", {
                 headers: {
-                    'Authorization': 'Bearer ' + token,
+                    'Authorization': 'Bearer ' + token
                 }
             });
-            const data = await response.json();
+            const data = await response.json()
 
             if (data.isSuccess) {
-                setUserInfo(data);
+                setUserInfo(data)
             } else {
-                console.log(data.message);
+                Alert.alert(data.message)
             }
         } catch (error) {
-            console.error(error);
+            console.error(error)
         }
-    };
+    }
 
     const getToken = async () => {
-        const result = await AsyncStorage.getItem("token");
+        const result = await AsyncStorage.getItem("token")
         if (result !== null) {
-            setToken(result);
+            setToken(result)
         }
     };
 
     const handleSigningOut = async () => {
-        await AsyncStorage.removeItem("token");
-        setToken('');
-        setUserInfo(undefined);
+        await AsyncStorage.removeItem("token")
+        setToken('')
+        setUserInfo(undefined)
     };
 
+    const handleDeletingAccount = () => {
+        Alert.prompt(
+            'Warning',
+            'This action is irreversible and will delete all tournaments you created. If you want to do it, type your password to confirm',
+            async (input: string) => {
+                try {
+                    const response = await fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/delete_user_account", {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify({
+                            'password': input
+                        })
+                    })
+                    const data = await response.json()
+        
+                    if (data.isSuccess) {
+                        handleSigningOut()
+                        Alert.alert('Success', data.message)
+                    } else {
+                        Alert.alert('Error', data.message)
+                    }
+                } catch (error) {
+                    console.error(error)
+                }
+            },
+            'secure-text'
+        )
+    }
+
     useEffect(() => {
-        getToken();
+        getToken()
         if (token) {
-            getUserInformation();
+            getUserInformation()
         }
-    }, [token]);
+    }, [token])
 
     return (
         <View style={styles.container}>
@@ -69,6 +100,7 @@ const Profile = ({ navigation, token, setToken }: any) => {
                     <Text variant="titleLarge" style={styles.text}>{userInfo.username}</Text>
                     <ProfileMenu navigation={navigation} userInfo={userInfo} setUserInfo={setUserInfo} />
                     <CustomButton buttonText="Sign out" onPress={handleSigningOut} />
+                    <CustomButton buttonText="Delete account" onPress={handleDeletingAccount} buttonColor={error} />
                 </ScrollView>
                 : <ScrollView>
                     <SignIn navigation={navigation} setToken={setToken} />

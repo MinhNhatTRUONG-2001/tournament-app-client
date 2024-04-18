@@ -38,7 +38,12 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
             `Delete this tournament will delete all stages and matches connected to it. Type "${tournamentInfo.name}" to confirm.`,
             (input: string) => {
                 if (input.trim() === tournamentInfo.name) {
-                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}/${token}`, { method: 'DELETE' })
+                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentInfo.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
                         .then(() => {
                             setTournamentList(tournamentList.filter((t: any) => t.id !== tournamentInfo.id))
                             navigation.goBack()

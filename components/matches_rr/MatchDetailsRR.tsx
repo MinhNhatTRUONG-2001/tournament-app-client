@@ -19,14 +19,20 @@ const MatchDetailsRR = ({ route, navigation }: any) => {
     });
 
     const { token } = route.params
+    const { stageInfo } = route.params
     const { matchId } = route.params
     const { matchList } = route.params
     const { setMatchList } = route.params
+    const { setTableResults } = route.params
     const [matchInfo, setMatchInfo] = useState<any>()
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()
@@ -53,13 +59,13 @@ const MatchDetailsRR = ({ route, navigation }: any) => {
         <View style={styles.container}>
             {matchInfo &&
                 <ScrollView>
-                    <MatchInfoRR matchInfo={matchInfo} />
+                    <MatchInfoRR matchInfo={matchInfo} stageInfo={stageInfo} />
                     <Divider />
                     {token &&
                         <>
-                            <CustomButton buttonText="Edit team name" onPress={() => navigation.navigate("EditTeamNamesRR", { navigation, token, setMatchList, matchInfo, setMatchInfo })} />
+                            <CustomButton buttonText="Edit team name" onPress={() => navigation.navigate("EditTeamNamesRR", { token, setMatchList, matchInfo, setMatchInfo, setTableResults })} />
                             <CustomButton buttonText="Edit match information" onPress={() => navigation.navigate("EditMatchInfoRR", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
-                            <CustomButton buttonText="Edit match scores" onPress={() => navigation.navigate("EditMatchScoresRR", { navigation, token, matchList, setMatchList, matchInfo, setMatchInfo })} />
+                            <CustomButton buttonText="Edit match scores" onPress={() => navigation.navigate("EditMatchScoresRR", { navigation, token, stageInfo, setMatchList, matchInfo, setMatchInfo, setTableResults })} />
                         </>
                     }
                 </ScrollView>

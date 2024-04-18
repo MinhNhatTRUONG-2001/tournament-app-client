@@ -49,10 +49,11 @@ const EditStageOrder = ({ route, navigation }: any) => {
         temporaryStageList.forEach(s => {
             requestBody.push({ id: s.id, tournament_id: s.tournament_id, name: s.name, stage_order: s.stage_order })
         });
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/order/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/order`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(requestBody),
         })

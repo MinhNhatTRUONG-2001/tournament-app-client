@@ -3,7 +3,7 @@ import { primary, secondary } from "../../theme/colors";
 import { useEffect, useState } from "react";
 import { DataTable, SegmentedButtons } from "react-native-paper";
 
-const MatchListRR = ({ navigation, token, stageId }: any) => {
+const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -27,7 +27,11 @@ const MatchListRR = ({ navigation, token, stageId }: any) => {
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${stageId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${stageId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()
@@ -43,7 +47,11 @@ const MatchListRR = ({ navigation, token, stageId }: any) => {
                     setGroupNumberButtonProperties(groupNumberButtonPropertiesObject)
                 })
                 .catch(console.error)
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()
@@ -107,15 +115,17 @@ const MatchListRR = ({ navigation, token, stageId }: any) => {
                                 <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>Points</DataTable.Title>
                                 <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>Difference</DataTable.Title>
                                 <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>Earned score</DataTable.Title>
+                                {stageInfo.other_criteria_names.map((name: string) => <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>{name}</DataTable.Title>)}
                             </DataTable.Header>
                             {tableResults[parseInt(selectedGroupNumber) - 1]
                                 .map((result: any, index: number) =>
                                     <DataTable.Row key={index}>
                                         <DataTable.Cell style={{ width: 70, justifyContent: 'center' }}>{index + 1}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 200, justifyContent: 'center' }}>{result.name}</DataTable.Cell>
-                                        <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{result.points > 0 ? "+" + result.points : result.points}</DataTable.Cell>
+                                        <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{result.points}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{result.difference > 0 ? "+" + result.difference : result.difference}</DataTable.Cell>
-                                        <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{result.accumulated_score > 0 ? "+" + result.accumulated_score : result.accumulated_score}</DataTable.Cell>
+                                        <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{result.accumulated_score}</DataTable.Cell>
+                                        {result.other_criteria_values.map((value: number) => <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                                     </DataTable.Row>
                                 )
                             }
@@ -141,7 +151,7 @@ const MatchListRR = ({ navigation, token, stageId }: any) => {
                                         team2Name += ' *'
                                     }
 
-                                    return <DataTable.Row key={index} onPress={() => navigation.navigate("MatchDetailsRR", { navigation, token, matchId: match.id, matchList, setMatchList })}>
+                                    return <DataTable.Row key={index} onPress={() => navigation.navigate("MatchDetailsRR", { navigation, token, stageInfo, matchId: match.id, matchList, setMatchList, setTableResults })}>
                                         <DataTable.Cell style={{ width: 70, justifyContent: 'center' }}>{match.leg_number}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 70, justifyContent: 'center' }}>{match.match_number}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 200, justifyContent: 'center' }}>{team1Name}</DataTable.Cell>

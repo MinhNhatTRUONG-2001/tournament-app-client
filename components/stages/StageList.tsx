@@ -32,7 +32,11 @@ const StageList = ({ navigation, token, tournamentId }: any) => {
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()

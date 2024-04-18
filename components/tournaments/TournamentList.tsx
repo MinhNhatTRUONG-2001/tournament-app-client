@@ -51,7 +51,11 @@ const TournamentList = ({ navigation, token }: any) => {
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/all/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/all`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()

@@ -94,14 +94,14 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                 requestBody["team_1_scores"][i] = 0
             }
             else {
-                requestBody["team_1_scores"][i] = parseInt(requestBody["team_1_scores"][i]) || 0
+                requestBody["team_1_scores"][i] = parseFloat(requestBody["team_1_scores"][i]) || 0
             }
         }
         for (var i = 0; i < requestBody["team_2_scores"].length; i++) {
             if (!requestBody["team_2_scores"][i]) {
                 requestBody["team_2_scores"][i] = 0;
             } else {
-                requestBody["team_2_scores"][i] = parseInt(requestBody["team_2_scores"][i]) || 0
+                requestBody["team_2_scores"][i] = parseFloat(requestBody["team_2_scores"][i]) || 0
             }
         }
         if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
@@ -116,7 +116,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                     requestBody["team_1_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_1_subscores"][i] = parseInt(requestBody["team_1_subscores"][i]) || 0
+                    requestBody["team_1_subscores"][i] = parseFloat(requestBody["team_1_subscores"][i]) || 0
                 }
             }
             for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
@@ -124,15 +124,16 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                     requestBody["team_2_subscores"][i] = 0
                 }
                 else {
-                    requestBody["team_2_subscores"][i] = parseInt(requestBody["team_2_subscores"][i]) || 0
+                    requestBody["team_2_subscores"][i] = parseFloat(requestBody["team_2_subscores"][i]) || 0
                 }
             }
         }
         //console.log(requestBody)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_score/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_score`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(requestBody),
         })
@@ -144,7 +145,11 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
             })
             .then(data => {
                 setMatchInfo(data)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${matchInfo.stage_id}/${token}`)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${matchInfo.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
                     .then(async response => {
                         if (response.ok) {
                             return response.json()
@@ -204,9 +209,9 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                     onChangeText={(text) => {
                                                         handleChange(`team_1_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
-                                                        values["team_1_scores"][index] = parseInt(text) || 0
-                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseInt(n))
-                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseInt(n))
+                                                        values["team_1_scores"][index] = parseFloat(text) || 0
+                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseFloat(n))
+                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseFloat(n))
                                                         if (team1TotalScore > team2TotalScore) {
                                                             handleChange(`winner`)(matchInfo.team_1)
                                                         }
@@ -215,7 +220,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                         }
                                                     }}
                                                     value={item.toString()}
-                                                    placeholder={`Leg ${index + 1}`}
+                                                    label={`Leg ${index + 1}`}
                                                 />
                                             </View>
                                         ))}
@@ -236,9 +241,9 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                     onChangeText={(text) => {
                                                         handleChange(`team_2_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
-                                                        values["team_2_scores"][index] = parseInt(text) || 0
-                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseInt(n))
-                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseInt(n))
+                                                        values["team_2_scores"][index] = parseFloat(text) || 0
+                                                        values["team_1_scores"].forEach((n: any) => team1TotalScore += parseFloat(n))
+                                                        values["team_2_scores"].forEach((n: any) => team2TotalScore += parseFloat(n))
                                                         if (team1TotalScore > team2TotalScore) {
                                                             handleChange(`winner`)(matchInfo.team_1)
                                                         }
@@ -247,7 +252,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                         }
                                                     }}
                                                     value={item.toString()}
-                                                    placeholder={`Leg ${index + 1}`}
+                                                    label={`Leg ${index + 1}`}
                                                 />
                                             </View>
                                         ))}
@@ -271,7 +276,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_1_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
-                                                                    placeholder={`Leg ${outerIndex + 1}, Subscore ${innerIndex + 1}`}
+                                                                    label={`Subscore ${innerIndex + 1}`}
                                                                 />
                                                             </View>
                                                         ))}
@@ -295,7 +300,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_2_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
-                                                                    placeholder={`Subscore ${innerIndex + 1}`}
+                                                                    label={`Subscore ${innerIndex + 1}`}
                                                                 />
                                                             </View>
                                                         ))}

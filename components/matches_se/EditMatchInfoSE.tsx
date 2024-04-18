@@ -67,10 +67,11 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
 
     const updateMatchInfo = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_info/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_info`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(values),
         })

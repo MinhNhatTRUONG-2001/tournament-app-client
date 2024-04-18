@@ -43,10 +43,11 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
 
     const updateTeamNames = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/team_name/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/team_name`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(values),
         })
@@ -58,7 +59,11 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
             })
             .then(data => {
                 setMatchInfo(data)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${data.stage_id}/${token}`)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${data.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
                     .then(async response => {
                         if (response.ok) {
                             return response.json()

@@ -3,7 +3,7 @@ import { primary } from "../../theme/colors";
 import { DataTable, Text } from "react-native-paper";
 import { getTimezone } from "../../data/getTimezone";
 
-const MatchInfoRR = ({ matchInfo }: any) => {
+const MatchInfoRR = ({ matchInfo, stageInfo }: any) => {
     const styles = StyleSheet.create({
         container: {
             backgroundColor: primary,
@@ -65,11 +65,30 @@ const MatchInfoRR = ({ matchInfo }: any) => {
                         </DataTable.Row>
                         <DataTable.Row>
                             <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_1}</DataTable.Title>
-                            {matchInfo.team_1_subscores.map((value: any) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
+                            {matchInfo.team_1_subscores.map((value: number) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                         </DataTable.Row>
                         <DataTable.Row>
                             <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_2}</DataTable.Title>
-                            {matchInfo.team_2_subscores.map((value: any) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
+                            {matchInfo.team_2_subscores.map((value: number) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
+                        </DataTable.Row>
+                    </DataTable>
+                </ScrollView>
+            }
+            <Text style={styles.keyText}>Other criteria:</Text>
+            {stageInfo.other_criteria_names &&
+                <ScrollView horizontal>
+                    <DataTable>
+                        <DataTable.Row>
+                            <DataTable.Title style={{ width: 100, justifyContent: 'center' }}> </DataTable.Title>
+                            {stageInfo.other_criteria_names.map((name: string) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{name}</DataTable.Cell>)}
+                        </DataTable.Row>
+                        <DataTable.Row>
+                            <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_1}</DataTable.Title>
+                            {matchInfo.team_1_other_criteria_values.map((value: number) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
+                        </DataTable.Row>
+                        <DataTable.Row>
+                            <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>{matchInfo.team_2}</DataTable.Title>
+                            {matchInfo.team_2_other_criteria_values.map((value: number) => <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                         </DataTable.Row>
                     </DataTable>
                 </ScrollView>

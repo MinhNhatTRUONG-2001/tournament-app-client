@@ -26,7 +26,11 @@ const MatchDetailsSE = ({ route, navigation }: any) => {
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()

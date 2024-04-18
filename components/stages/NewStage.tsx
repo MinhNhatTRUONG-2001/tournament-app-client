@@ -51,6 +51,7 @@ const NewStage = ({ route, navigation }: any) => {
     const [stageFormats, setStageFormats] = useState<any[]>()
     const [selectedStageFormatId, setSelectedStageFormatId] = useState<number>(1)
     const [showFormatsMenu, setShowFormatsMenu] = useState<boolean>(false)
+    const [showSortDirectionMenu, setShowSortDirectionMenu] = useState<boolean[]>([])
     const [thirdPlaceMatch, setThirdPlaceMatch] = useState<boolean>(false)
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
     const { token } = route.params
@@ -76,7 +77,10 @@ const NewStage = ({ route, navigation }: any) => {
         'third_place_match_best_of': 0,
         'win_point': 0,
         'draw_point': 0,
-        'lose_point': 0
+        'lose_point': 0,
+        'other_criteria': [],
+        'other_criteria_names': [],
+        'other_criteria_sort_direction': [] as string[]
     }
 
     const validationSchema = yup.object().shape({
@@ -151,6 +155,21 @@ const NewStage = ({ route, navigation }: any) => {
                 const { include_third_place_match } = this.parent
                 return (!include_third_place_match) || (include_third_place_match && (value === 0 || (value && value >= 1)))
             }),
+        win_point: yup
+            .number()
+            .required("This field is required"),
+        draw_point: yup
+            .number()
+            .required("This field is required"),
+        lose_point: yup
+            .number()
+            .required("This field is required"),
+        other_criteria_names: yup
+            .array()
+            .of(yup.string()),
+        other_criteria_sort_direction: yup
+            .array()
+            .of(yup.string()),
     })
 
     const changeStartDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
@@ -185,20 +204,35 @@ const NewStage = ({ route, navigation }: any) => {
                     }
                     requestBody["third_place_match_number_of_legs"] = parseInt(requestBody["third_place_match_number_of_legs"])
                     requestBody["third_place_match_best_of"] = parseInt(requestBody["third_place_match_best_of"])
-                    requestBody["win_point"] = parseInt(requestBody["win_point"]) || 0
-                    requestBody["draw_point"] = parseInt(requestBody["draw_point"]) || 0
-                    requestBody["lose_point"] = parseInt(requestBody["lose_point"]) || 0
+                    requestBody["win_point"] = parseFloat(requestBody["win_point"]) || 0
+                    requestBody["draw_point"] = parseFloat(requestBody["draw_point"]) || 0
+                    requestBody["lose_point"] = parseFloat(requestBody["lose_point"]) || 0
+                    for (var i = 0; i < requestBody["other_criteria_names"]; i++) {
+                        if (requestBody["other_criteria_names"][i] === null || requestBody["other_criteria_names"][i].trim() === '') {
+                            requestBody["other_criteria_names"][i] = 'Criteria ' + (i + 1)
+                        }
+                    }
+                    for (var i = 0; i < requestBody["other_criteria_sort_direction"]; i++) {
+                        if (requestBody["other_criteria_sort_direction"][i] === null || requestBody["other_criteria_sort_direction"][i].trim() === '') {
+                            requestBody["other_criteria_sort_direction"][i] = 'DESC'
+                        }
+                    }
                     //console.log(requestBody)
-                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${token}`, {
+                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
                         },
                         body: JSON.stringify(requestBody),
                     })
                         .then(() => {
                             values["format_id"] = stageFormats?.find(sf => sf.id === selectedStageFormatId).name
-                            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}/${token}`)
+                            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/all/${tournamentId}`, {
+                                headers: {
+                                    'Authorization': 'Bearer ' + token
+                                }
+                            })
                                 .then(async response => {
                                     if (response.ok) {
                                         return response.json()
@@ -268,7 +302,7 @@ const NewStage = ({ route, navigation }: any) => {
                                                         <TextInput
                                                             onChangeText={handleChange(`places.${index}`)}
                                                             value={item}
-                                                            placeholder="Place"
+                                                            label="Place"
                                                         />
                                                         <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                                     </View>
@@ -345,7 +379,7 @@ const NewStage = ({ route, navigation }: any) => {
                                                                         style={styles.text}
                                                                         inputMode="numeric"
                                                                         onChangeText={handleChange(`number_of_legs_per_round.${index}`)}
-                                                                        placeholder={`Round ${index + 1}`}
+                                                                        label={`Round ${index + 1}`}
                                                                     />
                                                                 ))}
                                                             </ScrollView>
@@ -367,7 +401,7 @@ const NewStage = ({ route, navigation }: any) => {
                                                                         style={styles.text}
                                                                         inputMode="numeric"
                                                                         onChangeText={handleChange(`best_of_per_round.${index}`)}
-                                                                        placeholder={`Round ${index + 1}`}
+                                                                        label={`Round ${index + 1}`}
                                                                     />
                                                                 ))}
                                                             </ScrollView>
@@ -454,6 +488,59 @@ const NewStage = ({ route, navigation }: any) => {
                                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                 value={values.lose_point.toString()}
                                             />
+                                            <Text style={styles.text}>Other criteria</Text>
+                                            <FieldArray name='other_criteria'>
+                                                {({ push, remove }) => (
+                                                    <>
+                                                        {values.other_criteria.map((item, index) => (
+                                                            <View style={styles.container2} key={index}>
+                                                                <TextInput
+                                                                    onChangeText={handleChange(`other_criteria_names.${index}`)}
+                                                                    value={item}
+                                                                    label="Name"
+                                                                />
+                                                                <Menu
+                                                                    visible={showSortDirectionMenu[index]}
+                                                                    onDismiss={() => setShowSortDirectionMenu(prevState => prevState.map((val, id) => id === index ? false : val))}
+                                                                    anchor={
+                                                                        <CustomTextInput
+                                                                            label="Sort direction"
+                                                                            editable={false}
+                                                                            onPressIn={() => setShowSortDirectionMenu(prevState => prevState.map((val, id) => id === index ? true : val))}
+                                                                        />
+                                                                    }
+                                                                >
+                                                                    <ScrollView>
+                                                                        {['ASC', 'DESC'].map(sd => <Menu.Item
+                                                                            onPress={() => {
+                                                                                values.other_criteria_sort_direction[index] = sd
+                                                                                setShowSortDirectionMenu(prevState => prevState.map((val, id) => id === index ? false : val))
+                                                                            }}
+                                                                            title={sd}
+                                                                        />)}
+                                                                    </ScrollView>
+                                                                </Menu>
+                                                                <CustomButton
+                                                                    buttonText="Remove"
+                                                                    onPress={() => {
+                                                                        remove(index)
+                                                                        setShowSortDirectionMenu(showSortDirectionMenu.splice(index, 1))
+                                                                    }}
+                                                                    buttonColor={error}
+                                                                />
+                                                            </View>
+                                                        ))}
+                                                        <CustomButton
+                                                            buttonText="Add Criteria"
+                                                            onPress={() => {
+                                                                push('')
+                                                                setShowSortDirectionMenu([...showSortDirectionMenu, false])
+                                                            }}
+                                                            buttonColor={secondary}
+                                                        />
+                                                    </>
+                                                )}
+                                            </FieldArray>
                                         </>
                                     }
                                     <CustomButton buttonText="Create stage" onPress={handleSubmit} />

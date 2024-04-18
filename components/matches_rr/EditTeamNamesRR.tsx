@@ -25,6 +25,7 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
     const { setMatchList } = route.params
     const { matchInfo } = route.params
     const { setMatchInfo } = route.params
+    const { setTableResults } = route.params
     const [serverErrorMessage, setServerErrorMessage] = useState<string>('')
 
     const initialValues1 = {
@@ -47,10 +48,11 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
 
     const updateTeamNames = (values: any) => {
         //console.log(values)
-        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchInfo.id}/team_name/${token}`, {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/${matchInfo.id}/team_name`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify(values),
         })
@@ -62,7 +64,11 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
             })
             .then(data => {
                 setMatchInfo(data)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${data.stage_id}/${token}`)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/all/${data.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
                     .then(async response => {
                         if (response.ok) {
                             return response.json()
@@ -72,6 +78,21 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
                     .then(data2 => {
                         setMatchList(data2)
                         Alert.alert("Update successfully")
+                    })
+                    .catch(console.error)
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${data.stage_id}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                })
+                    .then(async response => {
+                        if (response.ok) {
+                            return response.json()
+                        }
+                        else throw new Error(await response.text())
+                    })
+                    .then(data => {
+                        setTableResults(data)
                     })
                     .catch(console.error)
             })

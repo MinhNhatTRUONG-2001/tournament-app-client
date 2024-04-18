@@ -29,7 +29,11 @@ const TournamentDetails = ({ route, navigation }: any) => {
     const [tournamentInfo, setTournamentInfo] = useState<any>()
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()

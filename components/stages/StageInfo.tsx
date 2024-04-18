@@ -40,7 +40,12 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
             `Do you want to delete this stage and connected matches? Type "${stageInfo.name}" to confirm.`,
             (input: string) => {
                 if (input.trim() === stageInfo.name) {
-                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}/${token}`, { method: 'DELETE' })
+                    fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageInfo.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
                         .then(() => {
                             setStageList(stageList.filter((t: any) => t.id !== stageInfo.id))
                             navigation.goBack()

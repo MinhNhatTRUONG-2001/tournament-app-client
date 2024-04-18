@@ -28,7 +28,11 @@ const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch }: any
 
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${stageId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/all/${stageId}/`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()

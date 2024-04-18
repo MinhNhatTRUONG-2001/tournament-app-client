@@ -31,7 +31,11 @@ const StageDetails = ({ route, navigation }: any) => {
     const [stageInfo, setStageInfo] = useState<any>()
     useEffect(() => {
         if (token) {
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageId}/${token}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages/${stageId}`, {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
                 .then(async response => {
                     if (response.ok) {
                         return response.json()
@@ -81,6 +85,7 @@ const StageDetails = ({ route, navigation }: any) => {
                             navigation={navigation}
                             token={token}
                             stageId={stageId}
+                            stageInfo={stageInfo}
                         />
                     }
                 </ScrollView>
