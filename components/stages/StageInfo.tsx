@@ -91,7 +91,7 @@ const StageInfo = ({ navigation, token, stageList, setStageList, stageInfo, setS
                         <Text style={styles.valueText}> {stageInfo.end_date ? `${new Date(stageInfo.end_date).toLocaleString()} (UTC${getTimezone(new Date(stageInfo.end_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Places:
-                        <Text style={styles.valueText}> {stageInfo.places.length > 0 ? stageInfo.places.join('; ') : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {stageInfo.places && stageInfo.places.length > 0 ? stageInfo.places.join('; ') : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Description:
                         <Text style={styles.valueText}> {stageInfo.description ? stageInfo.description : 'N/A'}</Text>

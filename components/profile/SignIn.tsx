@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import { error, primary, tertiary } from "../../theme/colors";
 import CustomButton from "../custom/CustomButton";
 import { Checkbox, Divider, Text } from "react-native-paper";
@@ -59,12 +59,7 @@ const SignIn = ({ navigation, setToken }: any) => {
             },
             body: JSON.stringify(values),
         })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                }
-                else throw new Error(await response.text())
-            })
+            .then(response => response.json())
             .then(async data => {
                 if (data.isSuccess) {
                     setErrorMessage('')
@@ -89,8 +84,8 @@ const SignIn = ({ navigation, setToken }: any) => {
                             <Text variant="titleMedium" style={styles.text}>
                                 You haven't signed in yet. Sign in here:
                             </Text>
-                            <CustomTextInput name="username_or_email" label="Username or Email" inputMode="email" />
-                            <CustomTextInput name="password" label="Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="username_or_email" label="Username or Email" inputMode="email" />
+                            <FormikCustomTextInput name="password" label="Password" secureTextEntry={!showPassword} />
                             <Checkbox.Item
                                 label="Show password"
                                 labelStyle={{ textAlign: 'left' }}

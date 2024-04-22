@@ -1,13 +1,14 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary, tertiary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
-import { Checkbox, Text, TextInput } from "react-native-paper";
+import { Checkbox, Text } from "react-native-paper";
 import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const NewTournament = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -46,6 +47,11 @@ const NewTournament = ({ route, navigation }: any) => {
     const { token } = route.params
     const { tournamentList } = route.params
     const { setTournamentList } = route.params
+    const { setDisplayedTournamentList } = route.params
+    const { publicTournamentList } = route.params
+    const { setDisplayedPublicTournamentList } = route.params
+    const { setSearchTournamentList } = route.params
+    const { setSearchPublicTournamentList } = route.params
 
     const initialValues = {
         'name': 'New tournament',
@@ -92,7 +98,7 @@ const NewTournament = ({ route, navigation }: any) => {
     };
 
     const createTournament = (values: any) => {
-        //console.log(values)
+        console.log(values)
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments`, {
             method: 'POST',
             headers: {
@@ -109,6 +115,12 @@ const NewTournament = ({ route, navigation }: any) => {
             })
             .then((data: any) => {
                 setTournamentList([...tournamentList, data])
+                setDisplayedTournamentList([...tournamentList, data])
+                if (!data["is_private"]) {
+                    setDisplayedPublicTournamentList([...publicTournamentList, data])
+                }
+                setSearchTournamentList('')
+                setSearchPublicTournamentList('')
                 navigation.navigate('TournamentList')
             })
             .catch((error: any) => {
@@ -122,7 +134,7 @@ const NewTournament = ({ route, navigation }: any) => {
                 ({ handleSubmit, values, handleChange, errors }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="name" label="Name" />
+                            <FormikCustomTextInput name="name" label="Name" />
                             <Text style={styles.text}>Start date</Text>
                             <View style={styles.datePicker}>
                                 <RNDateTimePicker
@@ -144,10 +156,11 @@ const NewTournament = ({ route, navigation }: any) => {
                                     <>
                                         {values.places.map((item, index) => (
                                             <View style={styles.container2} key={index}>
-                                                <TextInput
+                                                <CustomTextInput
                                                     onChangeText={handleChange(`places.${index}`)}
                                                     value={item}
-                                                    label="Place"
+                                                    label={`Place ${index + 1}`}
+                                                    width="70%"
                                                 />
                                                 <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                             </View>
@@ -156,7 +169,7 @@ const NewTournament = ({ route, navigation }: any) => {
                                     </>
                                 )}
                             </FieldArray>
-                            <CustomTextInput
+                            <FormikCustomTextInput
                                 style={styles.multilineTextInput}
                                 name="description"
                                 label="Description"

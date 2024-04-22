@@ -1,10 +1,11 @@
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
 import { Menu, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const EditMatchScoresSE = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -177,7 +178,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                 visible={showTeamsMenu}
                                 onDismiss={() => setShowTeamsMenu(false)}
                                 anchor={
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         name="winner"
                                         label="Winner"
                                         editable={false}
@@ -201,12 +202,10 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                     <ScrollView horizontal>
                                         {values.team_1_scores.map((item: number, index: number) => (
                                             <View style={styles.container2} key={index}>
-                                                <Text style={styles.subText}>Leg {index + 1}</Text>
-                                                <TextInput
+                                                <CustomTextInput
                                                     key={index}
-                                                    style={styles.text}
                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
-                                                    onChangeText={(text) => {
+                                                    onChangeText={(text: string) => {
                                                         handleChange(`team_1_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
                                                         values["team_1_scores"][index] = parseFloat(text) || 0
@@ -221,6 +220,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                     }}
                                                     value={item.toString()}
                                                     label={`Leg ${index + 1}`}
+                                                    width={80}
                                                 />
                                             </View>
                                         ))}
@@ -233,12 +233,11 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                     <ScrollView horizontal>
                                         {values.team_2_scores.map((item: number, index: number) => (
                                             <View style={styles.container2} key={index}>
-                                                <Text style={styles.subText}>Leg {index + 1}</Text>
-                                                <TextInput
+                                                <CustomTextInput
                                                     key={index}
                                                     style={styles.text}
                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
-                                                    onChangeText={(text) => {
+                                                    onChangeText={(text: string) => {
                                                         handleChange(`team_2_scores.${index}`)(text)
                                                         var team1TotalScore = 0, team2TotalScore = 0
                                                         values["team_2_scores"][index] = parseFloat(text) || 0
@@ -253,6 +252,7 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                     }}
                                                     value={item.toString()}
                                                     label={`Leg ${index + 1}`}
+                                                    width={80}
                                                 />
                                             </View>
                                         ))}
@@ -270,13 +270,13 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                         <Text style={styles.subText}>Leg {outerIndex + 1}</Text>
                                                         {Array.isArray(subscoreArray) && subscoreArray.map((subscore: any, innerIndex: number) => (
                                                             <View style={styles.container2} key={innerIndex}>
-                                                                <TextInput
+                                                                <CustomTextInput
                                                                     key={innerIndex}
-                                                                    style={styles.text}
                                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_1_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
                                                                     label={`Subscore ${innerIndex + 1}`}
+                                                                    width={110}
                                                                 />
                                                             </View>
                                                         ))}
@@ -294,13 +294,13 @@ const EditMatchScoresSE = ({ route, navigation }: any) => {
                                                         <Text style={styles.subText}>Leg {outerIndex + 1}</Text>
                                                         {Array.isArray(subscoreArray) && subscoreArray.map((subscore: any, innerIndex: number) => (
                                                             <View style={styles.container2} key={innerIndex}>
-                                                                <TextInput
+                                                                <CustomTextInput
                                                                     key={innerIndex}
-                                                                    style={styles.text}
                                                                     keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                                     onChangeText={handleChange(`team_2_subscores.${outerIndex}.${innerIndex}`)}
                                                                     value={subscore.toString()}
                                                                     label={`Subscore ${innerIndex + 1}`}
+                                                                    width={110}
                                                                 />
                                                             </View>
                                                         ))}

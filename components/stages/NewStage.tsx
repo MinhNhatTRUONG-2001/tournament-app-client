@@ -1,14 +1,15 @@
 import { Alert, Platform, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary, tertiary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
-import { Checkbox, Divider, Menu, Text, TextInput } from "react-native-paper";
+import { Checkbox, Divider, Menu, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { stageFormatsEnum } from "../../data/stageFormatsEnum";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const NewStage = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -78,8 +79,8 @@ const NewStage = ({ route, navigation }: any) => {
         'win_point': 0,
         'draw_point': 0,
         'lose_point': 0,
-        'other_criteria': [],
-        'other_criteria_names': [],
+        'other_criteria': [] as string[],
+        'other_criteria_names': [] as string[],
         'other_criteria_sort_direction': [] as string[]
     }
 
@@ -125,9 +126,14 @@ const NewStage = ({ route, navigation }: any) => {
                 .min(1, 'All field(s) in "Number of legs / round" must be at least 1')
                 .max(3, 'All field(s) in "Number of legs / round" must be at most 3'))
             .test('is-equal-to-number-of-rounds', 'All "Number of legs / round" fields must be filled out', function (value) {
-                const { number_of_teams_per_group } = this.parent
-                var numberOfRounds = Math.ceil(Math.log2(number_of_teams_per_group))
-                return value && value.length === numberOfRounds
+                if (selectedStageFormatId === stageFormatsEnum.SINGLE_ELIMINATION) {
+                    const { number_of_teams_per_group } = this.parent
+                    var numberOfRounds = Math.ceil(Math.log2(number_of_teams_per_group))
+                    return value && value.length === numberOfRounds
+                }
+                else if (selectedStageFormatId === stageFormatsEnum.ROUND_ROBIN) {
+                    return value && value.length === 1
+                }
             }),
         best_of_per_round: yup
             .array()
@@ -136,9 +142,14 @@ const NewStage = ({ route, navigation }: any) => {
                 .required('Not all field(s) in "Best of / round" are filled')
                 .min(0, 'All field(s) in "Best of / round" must be at least 0'))
             .test('is-equal-to-number-of-rounds', 'All "Best of / round" fields must be filled out', function (value) {
-                const { number_of_teams_per_group } = this.parent
-                var numberOfRounds = Math.ceil(Math.log2(number_of_teams_per_group))
-                return value && value.length === numberOfRounds
+                if (selectedStageFormatId === stageFormatsEnum.SINGLE_ELIMINATION) {
+                    const { number_of_teams_per_group } = this.parent
+                    var numberOfRounds = Math.ceil(Math.log2(number_of_teams_per_group))
+                    return value && value.length === numberOfRounds
+                }
+                else if (selectedStageFormatId === stageFormatsEnum.ROUND_ROBIN) {
+                    return value && value.length === 1
+                }
             }),
         include_third_place_match: yup
             .bool()
@@ -213,10 +224,12 @@ const NewStage = ({ route, navigation }: any) => {
                         }
                     }
                     for (var i = 0; i < requestBody["other_criteria_sort_direction"]; i++) {
+                        console.log(requestBody["other_criteria_sort_direction"][i])
                         if (requestBody["other_criteria_sort_direction"][i] === null || requestBody["other_criteria_sort_direction"][i].trim() === '') {
                             requestBody["other_criteria_sort_direction"][i] = 'DESC'
                         }
                     }
+                    delete requestBody["other_criteria"]
                     //console.log(requestBody)
                     fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/stages`, {
                         method: 'POST',
@@ -273,11 +286,11 @@ const NewStage = ({ route, navigation }: any) => {
             {stageFormats &&
                 <Formik initialValues={initialValues} onSubmit={createStage} validationSchema={validationSchema}>
                     {
-                        ({ handleSubmit, values, handleChange, errors }) =>
+                        ({ handleSubmit, values, handleChange, errors, setFieldValue }) =>
                             <View style={styles.container}>
                                 <ScrollView>
                                     <Text variant="titleMedium" style={styles.subHeaderText}>Stage information</Text>
-                                    <CustomTextInput name="name" label="Name" />
+                                    <FormikCustomTextInput name="name" label="Name" />
                                     <Text style={styles.text}>Start date</Text>
                                     <View style={styles.datePicker}>
                                         <RNDateTimePicker
@@ -299,10 +312,11 @@ const NewStage = ({ route, navigation }: any) => {
                                             <>
                                                 {values.places.map((item, index) => (
                                                     <View style={styles.container2} key={index}>
-                                                        <TextInput
+                                                        <CustomTextInput
                                                             onChangeText={handleChange(`places.${index}`)}
                                                             value={item}
-                                                            label="Place"
+                                                            label={`Place ${index + 1}`}
+                                                            width="70%"
                                                         />
                                                         <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                                     </View>
@@ -311,7 +325,7 @@ const NewStage = ({ route, navigation }: any) => {
                                             </>
                                         )}
                                     </FieldArray>
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         style={styles.multilineTextInput}
                                         name="description"
                                         label="Description"
@@ -323,7 +337,7 @@ const NewStage = ({ route, navigation }: any) => {
                                         visible={showFormatsMenu}
                                         onDismiss={() => setShowFormatsMenu(false)}
                                         anchor={
-                                            <CustomTextInput
+                                            <FormikCustomTextInput
                                                 name="format_id"
                                                 label="Stage format"
                                                 editable={false}
@@ -335,10 +349,8 @@ const NewStage = ({ route, navigation }: any) => {
                                             {stageFormats?.map(s => <Menu.Item
                                                 onPress={() => {
                                                     values["format_id"] = s.name
-                                                    if (s.id !== selectedStageFormatId) {
-                                                        values["number_of_legs_per_round"] = []
-                                                        values["best_of_per_round"] = []
-                                                    }
+                                                    values["number_of_legs_per_round"] = []
+                                                    values["best_of_per_round"] = []
                                                     setSelectedStageFormatId(s.id)
                                                     setShowFormatsMenu(false)
                                                 }}
@@ -346,19 +358,19 @@ const NewStage = ({ route, navigation }: any) => {
                                             />)}
                                         </ScrollView>
                                     </Menu>
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         name="number_of_teams_per_group"
                                         label="Number of teams / group"
                                         inputMode="numeric"
                                         value={values.number_of_teams_per_group.toString()}
                                     />
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         name="number_of_groups"
                                         label="Number of groups"
                                         inputMode="numeric"
                                         value={values.number_of_groups.toString()}
                                     />
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         name="stage_order"
                                         label="Stage order"
                                         inputMode="numeric"
@@ -374,12 +386,12 @@ const NewStage = ({ route, navigation }: any) => {
                                                         return <View style={styles.container2}>
                                                             <ScrollView horizontal>
                                                                 {[...Array(numberOfRounds)].map((_, index) => (
-                                                                    <TextInput
+                                                                    <CustomTextInput
+                                                                        label={`Round ${index + 1}`}
                                                                         key={index}
-                                                                        style={styles.text}
                                                                         inputMode="numeric"
                                                                         onChangeText={handleChange(`number_of_legs_per_round.${index}`)}
-                                                                        label={`Round ${index + 1}`}
+                                                                        width={100}
                                                                     />
                                                                 ))}
                                                             </ScrollView>
@@ -396,12 +408,12 @@ const NewStage = ({ route, navigation }: any) => {
                                                         return <View style={styles.container2}>
                                                             <ScrollView horizontal>
                                                                 {[...Array(numberOfRounds)].map((_, index) => (
-                                                                    <TextInput
+                                                                    <CustomTextInput
+                                                                        label={`Round ${index + 1}`}    
                                                                         key={index}
-                                                                        style={styles.text}
                                                                         inputMode="numeric"
                                                                         onChangeText={handleChange(`best_of_per_round.${index}`)}
-                                                                        label={`Round ${index + 1}`}
+                                                                        width={100}
                                                                     />
                                                                 ))}
                                                             </ScrollView>
@@ -428,13 +440,13 @@ const NewStage = ({ route, navigation }: any) => {
                                             />
                                             {thirdPlaceMatch && (
                                                 <>
-                                                    <CustomTextInput
+                                                    <FormikCustomTextInput
                                                         name="third_place_match_number_of_legs"
                                                         label="Third place match number of legs (max. 3)"
                                                         inputMode="numeric"
                                                         value={values.third_place_match_number_of_legs.toString()}
                                                     />
-                                                    <CustomTextInput
+                                                    <FormikCustomTextInput
                                                         name="third_place_match_best_of"
                                                         label="Third place match best of"
                                                         inputMode="numeric"
@@ -446,43 +458,41 @@ const NewStage = ({ route, navigation }: any) => {
                                     }
                                     {selectedStageFormatId === stageFormatsEnum.ROUND_ROBIN &&
                                         <>
-                                            <Text style={styles.text}>Number of legs (max. 3)</Text>
                                             <FieldArray name="number_of_legs_per_round">
                                                 {() =>
-                                                    <TextInput
+                                                    <CustomTextInput
+                                                        label="Number of legs (max. 3)"
                                                         key={0}
-                                                        style={styles.text}
                                                         inputMode="numeric"
                                                         onChangeText={handleChange(`number_of_legs_per_round.${0}`)}
                                                     />
                                                 }
                                             </FieldArray>
                                             {(errors && errors.number_of_legs_per_round) && <Text style={styles.errorText}>{errors.number_of_legs_per_round}</Text>}
-                                            <Text style={styles.text}>Best of</Text>
                                             <FieldArray name="best_of_per_round">
                                                 {() =>
-                                                    <TextInput
+                                                    <CustomTextInput
+                                                        label="Best of"
                                                         key={0}
-                                                        style={styles.text}
                                                         inputMode="numeric"
                                                         onChangeText={handleChange(`best_of_per_round.${0}`)}
                                                     />
                                                 }
                                             </FieldArray>
                                             {(errors && errors.best_of_per_round) && <Text style={styles.errorText}>{errors.best_of_per_round}</Text>}
-                                            <CustomTextInput
+                                            <FormikCustomTextInput
                                                 name="win_point"
                                                 label="Win Point"
                                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                 value={values.win_point.toString()}
                                             />
-                                            <CustomTextInput
+                                            <FormikCustomTextInput
                                                 name="draw_point"
                                                 label="Draw Point"
                                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                 value={values.draw_point.toString()}
                                             />
-                                            <CustomTextInput
+                                            <FormikCustomTextInput
                                                 name="lose_point"
                                                 label="Lose Point"
                                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
@@ -494,10 +504,12 @@ const NewStage = ({ route, navigation }: any) => {
                                                     <>
                                                         {values.other_criteria.map((item, index) => (
                                                             <View style={styles.container2} key={index}>
-                                                                <TextInput
+                                                                <Text style={styles.text}>{index + 1}. </Text>
+                                                                <CustomTextInput
                                                                     onChangeText={handleChange(`other_criteria_names.${index}`)}
-                                                                    value={item}
                                                                     label="Name"
+                                                                    width="30%"
+                                                                    value={values.other_criteria_names[index]}
                                                                 />
                                                                 <Menu
                                                                     visible={showSortDirectionMenu[index]}
@@ -505,15 +517,17 @@ const NewStage = ({ route, navigation }: any) => {
                                                                     anchor={
                                                                         <CustomTextInput
                                                                             label="Sort direction"
+                                                                            value={values.other_criteria_sort_direction[index]}
                                                                             editable={false}
                                                                             onPressIn={() => setShowSortDirectionMenu(prevState => prevState.map((val, id) => id === index ? true : val))}
+                                                                            width={150}
                                                                         />
                                                                     }
                                                                 >
                                                                     <ScrollView>
                                                                         {['ASC', 'DESC'].map(sd => <Menu.Item
                                                                             onPress={() => {
-                                                                                values.other_criteria_sort_direction[index] = sd
+                                                                                setFieldValue(`other_criteria_sort_direction.${index}`, sd)
                                                                                 setShowSortDirectionMenu(prevState => prevState.map((val, id) => id === index ? false : val))
                                                                             }}
                                                                             title={sd}
@@ -524,7 +538,13 @@ const NewStage = ({ route, navigation }: any) => {
                                                                     buttonText="Remove"
                                                                     onPress={() => {
                                                                         remove(index)
-                                                                        setShowSortDirectionMenu(showSortDirectionMenu.splice(index, 1))
+                                                                        setFieldValue(`other_criteria_names`, values["other_criteria_names"].filter((_, i) => i !== index))
+                                                                        setFieldValue(`other_criteria_sort_direction`, values["other_criteria_sort_direction"].filter((_, i) => i !== index))
+                                                                        setShowSortDirectionMenu(prevState => {
+                                                                            const newState = [...prevState]
+                                                                            newState.splice(index, 1)
+                                                                            return newState
+                                                                        })
                                                                     }}
                                                                     buttonColor={error}
                                                                 />
@@ -534,6 +554,8 @@ const NewStage = ({ route, navigation }: any) => {
                                                             buttonText="Add Criteria"
                                                             onPress={() => {
                                                                 push('')
+                                                                values["other_criteria_names"].push('')
+                                                                values["other_criteria_sort_direction"].push('DESC')
                                                                 setShowSortDirectionMenu([...showSortDirectionMenu, false])
                                                             }}
                                                             buttonColor={secondary}

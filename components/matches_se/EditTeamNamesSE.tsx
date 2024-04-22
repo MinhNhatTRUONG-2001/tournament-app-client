@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
 import { Formik } from "formik";
@@ -87,8 +87,8 @@ const EditTeamNamesSE = ({ route, navigation }: any) => {
                 ({ handleSubmit }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="team_1" label="Team 1" />
-                            <CustomTextInput name="team_2" label="Team 2" />
+                            <FormikCustomTextInput name="team_1" label="Team 1" />
+                            <FormikCustomTextInput name="team_2" label="Team 2" />
                             <CustomButton buttonText="Update" onPress={handleSubmit} />
                             <Text style={styles.errorText}>{serverErrorMessage}</Text>
                         </ScrollView>

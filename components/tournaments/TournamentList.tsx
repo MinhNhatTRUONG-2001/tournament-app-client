@@ -30,6 +30,10 @@ const TournamentList = ({ navigation, token }: any) => {
             paddingTop: 10,
             paddingBottom: 5
         },
+        searchbar: {
+            marginTop: 5,
+            marginHorizontal: 5
+        }
     });
 
     const [tournamentList, setTournamentList] = useState<any[]>()
@@ -92,6 +96,8 @@ const TournamentList = ({ navigation, token }: any) => {
                                 placeholder="Search"
                                 onChangeText={query => filterDisplayedTournamentList(query)}
                                 value={searchTournamentList}
+                                style={styles.searchbar}
+                                theme={{ colors: { primary: tertiary } }}
                             />
                             {displayedTournamentList &&
                                 <List.Section>
@@ -100,7 +106,11 @@ const TournamentList = ({ navigation, token }: any) => {
                                             key={t.id}
                                             title={t.name}
                                             right={() => <List.Icon icon="chevron-right" />}
-                                            onPress={() => navigation.navigate("TournamentDetails", { navigation, token, tournamentId: t.id, tournamentList, setTournamentList })}
+                                            onPress={() => navigation.navigate("TournamentDetails", {
+                                                navigation, token, tournamentId: t.id, tournamentList, setTournamentList,
+                                                setDisplayedTournamentList, publicTournamentList, setDisplayedPublicTournamentList,
+                                                setSearchTournamentList, setSearchPublicTournamentList
+                                            })}
                                             style={styles.item}
                                         />
                                     ))}
@@ -109,7 +119,11 @@ const TournamentList = ({ navigation, token }: any) => {
                             <CustomButton
                                 buttonText="New tournament"
                                 icon="plus"
-                                onPress={() => navigation.navigate("NewTournament", { navigation, token, tournamentList, setTournamentList })}
+                                onPress={() => navigation.navigate("NewTournament", {
+                                    navigation, token, tournamentList, setTournamentList,
+                                    setDisplayedTournamentList, publicTournamentList, setDisplayedPublicTournamentList,
+                                    setSearchTournamentList, setSearchPublicTournamentList
+                                })}
                             />
                         </>
                     ) : (
@@ -130,6 +144,8 @@ const TournamentList = ({ navigation, token }: any) => {
                     placeholder="Search"
                     onChangeText={query => filterDisplayedPublicTournamentList(query)}
                     value={searchPublicTournamentList}
+                    style={styles.searchbar}
+                    theme={{ colors: { primary: tertiary } }}
                 />
                 {displayedPublicTournamentList &&
                     <List.Section>

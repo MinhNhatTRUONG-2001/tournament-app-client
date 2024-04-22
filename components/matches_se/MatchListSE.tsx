@@ -40,6 +40,7 @@ const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch }: any
                     else throw new Error(await response.text())
                 })
                 .then(data => {
+                    
                     setMatchList(data)
                     var groupNumberArray: any[] = [], roundNumberArray: any[] = []
                     groupNumberArray = Array.from(new Set(data.map((match: any) => match.group_number))).sort()
@@ -114,9 +115,9 @@ const MatchListSE = ({ navigation, token, stageId, includeThirdPlaceMatch }: any
                                 <DataTable.Title style={{ width: 170, justifyContent: 'center' }}>Winner's Next Round Match</DataTable.Title>
                             </DataTable.Header>
                             {matchList.filter(match => match.group_number.toString() === selectedGroupNumber && match.round_number.toString() === selectedRoundNumber)
-                                .sort((a, b) => a.match_number - b.match_number)
+                                .sort((a: any, b: any) => a.match_number - b.match_number)
                                 .map((match, index) => {
-                                    var team1Name = match.team_1, team2Name = match.team_2
+                                    var team1Name = match.team_1 || ' ', team2Name = match.team_2 || ' '
                                     if (match.winner && match.winner === match.team_1) {
                                         team1Name += ' *'
                                     }

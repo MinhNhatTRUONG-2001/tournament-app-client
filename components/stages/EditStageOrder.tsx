@@ -1,8 +1,9 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
-import { Text, TextInput } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useState } from "react";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const EditStageOrder = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -78,12 +79,11 @@ const EditStageOrder = ({ route, navigation }: any) => {
             <ScrollView>
                 {temporaryStageList.map((stage, index) =>
                     <View style={styles.container2}>
-                        <TextInput
-                            style={styles.textInput}
+                        <CustomTextInput
                             key={index}
                             value={stage.stage_order.toString()}
                             inputMode="numeric"
-                            onChangeText={(value) => handleInputChange(index, value)}
+                            onChangeText={(value: string) => handleInputChange(index, value)}
                         />
                         <Text>{stage.name}</Text>
                     </View>

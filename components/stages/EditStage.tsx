@@ -1,13 +1,14 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
-import { Text, TextInput } from "react-native-paper";
+import { Text } from "react-native-paper";
 import { useState } from "react";
 import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const EditStage = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -124,7 +125,7 @@ const EditStage = ({ route, navigation }: any) => {
                 ({ handleSubmit, values, handleChange, errors }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="name" label="Name" />
+                            <FormikCustomTextInput name="name" label="Name" />
                             <Text style={styles.text}>Start date</Text>
                             <View style={styles.datePicker}>
                                 <RNDateTimePicker
@@ -144,12 +145,13 @@ const EditStage = ({ route, navigation }: any) => {
                             <FieldArray name="places">
                                 {({ push, remove }) => (
                                     <>
-                                        {values.places.map((item: string, index: number) => (
+                                        {values.places?.map((item: string, index: number) => (
                                             <View style={styles.container2} key={index}>
-                                                <TextInput
+                                                <CustomTextInput
                                                     onChangeText={handleChange(`places.${index}`)}
                                                     value={item}
-                                                    label="Place"
+                                                    label={`Place ${index + 1}`}
+                                                    width="70%"
                                                 />
                                                 <CustomButton buttonText="Remove" onPress={() => remove(index)} buttonColor={error} />
                                             </View>
@@ -158,7 +160,7 @@ const EditStage = ({ route, navigation }: any) => {
                                     </>
                                 )}
                             </FieldArray>
-                            <CustomTextInput
+                            <FormikCustomTextInput
                                 style={styles.multilineTextInput}
                                 name="description"
                                 label="Description"

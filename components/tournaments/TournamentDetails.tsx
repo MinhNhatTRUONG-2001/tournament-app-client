@@ -26,7 +26,14 @@ const TournamentDetails = ({ route, navigation }: any) => {
     const { tournamentId } = route.params
     const { tournamentList } = route.params
     const { setTournamentList } = route.params
+    const { setDisplayedTournamentList } = route.params
+    const { publicTournamentList } = route.params
+    const { setDisplayedPublicTournamentList } = route.params
+    const { setSearchTournamentList } = route.params
+    const { setSearchPublicTournamentList } = route.params
     const [tournamentInfo, setTournamentInfo] = useState<any>()
+    const [username, setUsername] = useState<string>('')
+
     useEffect(() => {
         if (token) {
             fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/tournaments/${tournamentId}`, {
@@ -40,7 +47,17 @@ const TournamentDetails = ({ route, navigation }: any) => {
                     }
                     else throw new Error(await response.text())
                 })
-                .then(data => setTournamentInfo(data))
+                .then(data => {
+                    setTournamentInfo(data)
+                    fetch(`${process.env.EXPO_PUBLIC_AUTH_SERVER_URL}/username/${data.user_id}`)
+                        .then(response => response.json())
+                        .then((data) => {
+                            if (data.isSuccess) {
+                                setUsername(data.username)
+                            }
+                        })
+                        .catch(console.error)
+                })
                 .catch(console.error)
         }
         else {
@@ -51,7 +68,17 @@ const TournamentDetails = ({ route, navigation }: any) => {
                     }
                     else throw new Error(await response.text())
                 })
-                .then(data => setTournamentInfo(data))
+                .then(data => {
+                    setTournamentInfo(data)
+                    fetch(`${process.env.EXPO_PUBLIC_AUTH_SERVER_URL}/username/${data.user_id}`)
+                        .then(response => response.json())
+                        .then((data) => {
+                            if (data.isSuccess) {
+                                setUsername(data.username)
+                            }
+                        })
+                        .catch(console.error)
+                })
                 .catch(console.error)
         }
     }, [])
@@ -63,10 +90,16 @@ const TournamentDetails = ({ route, navigation }: any) => {
                 <TournamentInfo
                     navigation={navigation}
                     token={token}
+                    username={username}
                     tournamentList={tournamentList}
                     setTournamentList={setTournamentList}
                     tournamentInfo={tournamentInfo}
-                    setTournamentInfo={setTournamentInfo} />
+                    setTournamentInfo={setTournamentInfo}
+                    setDisplayedTournamentList={setDisplayedTournamentList}
+                    publicTournamentList={publicTournamentList}
+                    setDisplayedPublicTournamentList={setDisplayedPublicTournamentList}
+                    setSearchTournamentList={setSearchTournamentList}
+                    setSearchPublicTournamentList={setSearchPublicTournamentList} />
                 <Divider />
                 <Text variant="titleMedium" style={styles.text}>Stage list</Text>
                 <StageList

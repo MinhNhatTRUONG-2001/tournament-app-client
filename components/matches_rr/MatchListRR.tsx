@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, View } from "react-native";
 import { primary, secondary } from "../../theme/colors";
 import { useEffect, useState } from "react";
-import { DataTable, SegmentedButtons } from "react-native-paper";
+import { DataTable, Divider, SegmentedButtons, Text } from "react-native-paper";
 
 const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
     const styles = StyleSheet.create({
@@ -17,6 +17,10 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
         segmentedButtons: {
             margin: 5,
             borderRadius: 0
+        },
+        text: {
+            alignSelf: 'center',
+            paddingTop: 10
         }
     });
 
@@ -24,6 +28,25 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
     const [tableResults, setTableResults] = useState<any[]>()
     const [groupNumberButtonProperties, setGroupNumberButtonProperties] = useState<any[]>([])
     const [selectedGroupNumber, setSelectedGroupNumber] = useState('1')
+
+    const handleChangingGroupNumber = (value: string) => {
+        fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}/${value}`, {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(async response => {
+                if (response.ok) {
+                    return response.json()
+                }
+                else throw new Error(await response.text())
+            })
+            .then(data => {
+                setTableResults(data)
+            })
+            .catch(console.error)
+        setSelectedGroupNumber(value)
+    }
 
     useEffect(() => {
         if (token) {
@@ -47,7 +70,7 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
                     setGroupNumberButtonProperties(groupNumberButtonPropertiesObject)
                 })
                 .catch(console.error)
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}`, {
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}/1`, {
                 headers: {
                     'Authorization': 'Bearer ' + token
                 }
@@ -80,7 +103,7 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
                     setGroupNumberButtonProperties(groupNumberButtonPropertiesObject)
                 })
                 .catch(console.error)
-            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}`)
+            fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${stageId}/1`)
                 .then(async response => {
                     if (response.ok) {
                         return response.json()
@@ -103,10 +126,11 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
                             theme={{ colors: { secondaryContainer: secondary }, roundness: 0 }}
                             style={styles.segmentedButtons}
                             value={selectedGroupNumber}
-                            onValueChange={setSelectedGroupNumber}
+                            onValueChange={(value) => handleChangingGroupNumber(value)}
                             buttons={groupNumberButtonProperties}
                         />
                     </ScrollView>
+                    <Text variant="titleMedium" style={styles.text}>Table results</Text>
                     <ScrollView horizontal>
                         <DataTable>
                             <DataTable.Header>
@@ -115,22 +139,23 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
                                 <DataTable.Title style={{ width: 100, justifyContent: 'center' }}>Points</DataTable.Title>
                                 <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>Difference</DataTable.Title>
                                 <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>Earned score</DataTable.Title>
-                                {stageInfo.other_criteria_names.map((name: string) => <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>{name}</DataTable.Title>)}
+                                {stageInfo.other_criteria_names && stageInfo.other_criteria_names.map((name: string) => <DataTable.Title style={{ width: 150, justifyContent: 'center' }}>{name}</DataTable.Title>)}
                             </DataTable.Header>
-                            {tableResults[parseInt(selectedGroupNumber) - 1]
-                                .map((result: any, index: number) =>
+                            {tableResults.map((result: any, index: number) =>
                                     <DataTable.Row key={index}>
                                         <DataTable.Cell style={{ width: 70, justifyContent: 'center' }}>{index + 1}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 200, justifyContent: 'center' }}>{result.name}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 100, justifyContent: 'center' }}>{result.points}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{result.difference > 0 ? "+" + result.difference : result.difference}</DataTable.Cell>
                                         <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{result.accumulated_score}</DataTable.Cell>
-                                        {result.other_criteria_values.map((value: number) => <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
+                                        {result.other_criteria_values && result.other_criteria_values.map((value: number) => <DataTable.Cell style={{ width: 150, justifyContent: 'center' }}>{value}</DataTable.Cell>)}
                                     </DataTable.Row>
                                 )
                             }
                         </DataTable>
                     </ScrollView>
+                    <Divider />
+                    <Text variant="titleMedium" style={styles.text}>Match List</Text>
                     <ScrollView horizontal>
                         <DataTable>
                             <DataTable.Header>

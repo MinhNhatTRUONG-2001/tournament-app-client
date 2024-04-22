@@ -2,7 +2,7 @@ import { Alert, ScrollView, StyleSheet, View } from "react-native"
 import { Checkbox, Text } from "react-native-paper"
 import { error, primary, tertiary } from "../../../theme/colors";
 import { Formik } from "formik";
-import CustomTextInput from "../../custom/CustomTextInput";
+import FormikCustomTextInput from "../../custom/FormikCustomTextInput";
 import CustomButton from "../../custom/CustomButton";
 import * as yup from 'yup';
 import { useState } from "react";
@@ -66,12 +66,7 @@ const ChangePassword = ({ token }: any) => {
             },
             body: JSON.stringify(request_body),
         })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                }
-                else throw new Error(await response.text())
-            })
+            .then(response => response.json())
             .then(async data => {
                 if (data.isSuccess) {
                     setErrorMessage('')
@@ -92,9 +87,9 @@ const ChangePassword = ({ token }: any) => {
                 ({ handleSubmit, resetForm }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="current_password" label="Current Password" secureTextEntry={!showPassword} />
-                            <CustomTextInput name="new_password" label="New Password" secureTextEntry={!showPassword} />
-                            <CustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="current_password" label="Current Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="new_password" label="New Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="confirm_new_password" label="Confirm New Password" secureTextEntry={!showPassword} />
                             <Checkbox.Item
                                 label="Show password"
                                 labelStyle={{ textAlign: 'left' }}

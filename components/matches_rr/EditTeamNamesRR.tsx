@@ -1,5 +1,5 @@
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
 import { Formik } from "formik";
@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { Divider, Text } from "react-native-paper";
 import { useState } from "react";
 
-const EditTeamNamesRR = ({ route, navigation }: any) => {
+const EditTeamNamesRR = ({ route }: any) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
@@ -108,7 +108,7 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
                     {
                         ({ handleSubmit }) =>
                             <>
-                                <CustomTextInput name="new_team_name" label="Team 1" />
+                                <FormikCustomTextInput name="new_team_name" label="Team 1" />
                                 <CustomButton buttonText="Update" onPress={handleSubmit} />
                                 <Text style={styles.errorText}>{serverErrorMessage}</Text>
                             </>
@@ -119,7 +119,7 @@ const EditTeamNamesRR = ({ route, navigation }: any) => {
                     {
                         ({ handleSubmit }) =>
                             <>
-                                <CustomTextInput name="new_team_name" label="Team 2" />
+                                <FormikCustomTextInput name="new_team_name" label="Team 2" />
                                 <CustomButton buttonText="Update" onPress={handleSubmit} />
                                 <Text style={styles.errorText}>{serverErrorMessage}</Text>
                             </>

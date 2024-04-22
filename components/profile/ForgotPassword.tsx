@@ -1,5 +1,5 @@
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import { error, primary } from "../../theme/colors";
 import CustomButton from "../custom/CustomButton";
 import { Text } from "react-native-paper";
@@ -50,12 +50,7 @@ const ForgotPassword = () => {
             },
             body: JSON.stringify(values),
         })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                }
-                else throw new Error(await response.text())
-            })
+            .then(response => response.json())
             .then(async data => {
                 if (data.isSuccess) {
                     setErrorMessage('')
@@ -79,7 +74,7 @@ const ForgotPassword = () => {
                             <Text variant="titleMedium" style={styles.text}>
                                 Enter your registered email address to send a request for the password reset
                             </Text>
-                            <CustomTextInput name="email" label="Email" inputMode="email" />
+                            <FormikCustomTextInput name="email" label="Email" inputMode="email" />
                             <CustomButton buttonText="Reset password" onPress={handleSubmit} disabled={disabledSubmitButton} />
                             <Text style={styles.errorText}>{errorMessage}</Text>
                         </ScrollView>

@@ -58,28 +58,27 @@ const Profile = ({ navigation, token, setToken }: any) => {
         Alert.prompt(
             'Warning',
             'This action is irreversible and will delete all tournaments you created. If you want to do it, type your password to confirm',
-            async (input: string) => {
-                try {
-                    const response = await fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/delete_user_account", {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: JSON.stringify({
-                            'password': input
-                        })
+            (input: string) => {
+                fetch(process.env.EXPO_PUBLIC_AUTH_SERVER_URL + "/delete_user_account", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        'password': input
                     })
-                    const data = await response.json()
-        
+                })
+                .then(response => response.json())
+                .then(data => {
                     if (data.isSuccess) {
                         handleSigningOut()
                         Alert.alert('Success', data.message)
                     } else {
                         Alert.alert('Error', data.message)
                     }
-                } catch (error) {
-                    console.error(error)
-                }
+                })
+                .catch(console.error)
             },
             'secure-text'
         )

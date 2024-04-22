@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
 import { Formik } from "formik";
@@ -114,8 +114,8 @@ const EditMatchInfoRR = ({ route, navigation }: any) => {
                                     />
                                 </View>
                             </View>
-                            <CustomTextInput name="place" label="Place" />
-                            <CustomTextInput
+                            <FormikCustomTextInput name="place" label="Place" />
+                            <FormikCustomTextInput
                                 style={styles.multilineTextInput}
                                 name="note"
                                 label="Note"

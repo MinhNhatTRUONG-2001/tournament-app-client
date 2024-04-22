@@ -1,5 +1,5 @@
 import { Alert, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, tertiary } from "../../theme/colors";
 import { Formik } from "formik";
@@ -69,12 +69,7 @@ const SignUp = ({ navigation, setToken }: any) => {
             },
             body: JSON.stringify(values),
         })
-            .then(async response => {
-                if (response.ok) {
-                    return response.json()
-                }
-                else throw new Error(await response.text())
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.isSuccess) {
                     Alert.alert(data.message)
@@ -123,9 +118,9 @@ const SignUp = ({ navigation, setToken }: any) => {
                 ({ handleSubmit }) =>
                     <View style={styles.container}>
                         <ScrollView>
-                            <CustomTextInput name="username" label="Username" />
-                            <CustomTextInput name="email" label="Email" inputMode="email" />
-                            <CustomTextInput name="password" label="Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="username" label="Username" />
+                            <FormikCustomTextInput name="email" label="Email" inputMode="email" />
+                            <FormikCustomTextInput name="password" label="Password" secureTextEntry={!showPassword} />
                             <Text style={styles.text}>Password requirements:</Text>
                             <Text style={styles.text}>{"\u2022"} 8-64 characters</Text>
                             <Text style={styles.text}>{"\u2022"} At least one digit (0-9)</Text>
@@ -133,7 +128,7 @@ const SignUp = ({ navigation, setToken }: any) => {
                             <Text style={styles.text}>{"\u2022"} At least one uppercase letter (A-Z)</Text>
                             <Text style={styles.text}>{"\u2022"} At least one special character</Text>
                             <Text style={styles.text}>* Note: Do not add leading and trailing whitespaces. They will be removed after submitting.</Text>
-                            <CustomTextInput name="confirm_password" label="Confirm Password" secureTextEntry={!showPassword} />
+                            <FormikCustomTextInput name="confirm_password" label="Confirm Password" secureTextEntry={!showPassword} />
                             <Checkbox.Item
                                 label="Show password"
                                 labelStyle={{ textAlign: 'left' }}

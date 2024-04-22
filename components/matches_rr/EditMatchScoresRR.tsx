@@ -1,10 +1,11 @@
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
-import CustomTextInput from "../custom/CustomTextInput";
+import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary } from "../../theme/colors";
 import { FieldArray, Formik } from "formik";
-import { Menu, Text, TextInput } from "react-native-paper";
+import { Menu, Text } from "react-native-paper";
 import { useState } from "react";
+import CustomTextInput from "../custom/CustomTextInput";
 
 const EditMatchScoresRR = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -125,7 +126,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                         navigation.goBack()
                     })
                     .catch(console.error)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${matchInfo.stage_id}`, {
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${matchInfo.stage_id}/${matchInfo.group_number}`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
@@ -156,7 +157,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                 visible={showTeamsMenu}
                                 onDismiss={() => setShowTeamsMenu(false)}
                                 anchor={
-                                    <CustomTextInput
+                                    <FormikCustomTextInput
                                         name="winner"
                                         label="Winner"
                                         editable={false}
@@ -174,32 +175,32 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                     />)}
                                 </ScrollView>
                             </Menu>
-                            <CustomTextInput
+                            <FormikCustomTextInput
                                 name="team_1_score"
                                 label={`${matchInfo.team_1} Score`}
                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                 value={values.team_1_score.toString()}
                             />
-                            <CustomTextInput
+                            <FormikCustomTextInput
                                 name="team_2_score"
                                 label={`${matchInfo.team_2} Score`}
                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                 value={values.team_2_score.toString()}
                             />
-                            {matchInfo.best_of > 0 &&
+                            {(matchInfo.team_1_subscores && matchInfo.team_2_subscores) &&
                                 <>
                                     <Text style={styles.text}>{matchInfo.team_1} Subscores</Text>
                                     <FieldArray name="team_1_subscores">
                                         {() => (
                                             <ScrollView horizontal>
                                                 {values.team_1_subscores?.map((value: any, index: number) => (
-                                                    <TextInput
+                                                    <CustomTextInput
                                                         key={index}
-                                                        style={styles.text}
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_1_subscores.${index}`)}
                                                         value={value.toString()}
                                                         label={`Subscore ${index + 1}`}
+                                                        width={110}
                                                     />
                                                 ))}
                                             </ScrollView>
@@ -210,13 +211,13 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                         {() => (
                                             <ScrollView horizontal>
                                                 {values.team_2_subscores?.map((value: any, index: number) => (
-                                                    <TextInput
+                                                    <CustomTextInput
                                                         key={index}
-                                                        style={styles.text}
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_2_subscores.${index}`)}
                                                         value={value.toString()}
                                                         label={`Subscore ${index + 1}`}
+                                                        width={110}
                                                     />
                                                 ))}
                                             </ScrollView>
@@ -231,13 +232,13 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                         {() => (
                                             <ScrollView horizontal>
                                                 {values.team_1_other_criteria_values?.map((value: any, index: number) => (
-                                                    <TextInput
+                                                    <CustomTextInput
                                                         key={index}
-                                                        style={styles.text}
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_1_other_criteria_values.${index}`)}
                                                         value={value.toString()}
                                                         label={stageInfo.other_criteria_names[index]}
+                                                        width={150}
                                                     />
                                                 ))}
                                             </ScrollView>
@@ -248,13 +249,13 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                         {() => (
                                             <ScrollView horizontal>
                                                 {values.team_2_other_criteria_values?.map((value: any, index: number) => (
-                                                    <TextInput
+                                                    <CustomTextInput
                                                         key={index}
-                                                        style={styles.text}
                                                         keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                                         onChangeText={handleChange(`team_2_other_criteria_values.${index}`)}
                                                         value={value.toString()}
                                                         label={stageInfo.other_criteria_names[index]}
+                                                        width={150}
                                                     />
                                                 ))}
                                             </ScrollView>

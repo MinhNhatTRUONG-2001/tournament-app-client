@@ -5,7 +5,7 @@ import CustomButton from "../custom/CustomButton";
 import { useState } from "react";
 import { getTimezone } from "../../data/getTimezone";
 
-const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo }: any) => {
+const TournamentInfo = ({ navigation, token, username, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo, setDisplayedTournamentList, publicTournamentList, setDisplayedPublicTournamentList, setSearchTournamentList, setSearchPublicTournamentList }: any) => {
     const styles = StyleSheet.create({
         container: {
             backgroundColor: primary,
@@ -60,10 +60,13 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
 
     return (
         <View style={styles.container}>
-            {tournamentInfo &&
+            {(tournamentInfo && username) &&
                 <>
                     <Text style={styles.keyText}>Name:
                         <Text style={styles.valueText}> {tournamentInfo.name}</Text>
+                    </Text>
+                    <Text style={styles.keyText}>User:
+                        <Text style={styles.valueText}> {username}</Text>
                     </Text>
                     <Text style={styles.keyText}>Start date:
                         <Text style={styles.valueText}> {tournamentInfo.start_date ? `${new Date(tournamentInfo.start_date).toLocaleString()} (UTC${getTimezone(new Date(tournamentInfo.start_date))})` : 'N/A'}</Text>
@@ -79,7 +82,11 @@ const TournamentInfo = ({ navigation, token, tournamentList, setTournamentList, 
                     </Text>
                     {token &&
                         <>
-                            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", { navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo })} />
+                            <CustomButton buttonText="Edit" onPress={() => navigation.navigate("EditTournament", {
+                                navigation, token, tournamentList, setTournamentList, tournamentInfo, setTournamentInfo,
+                                setDisplayedTournamentList, publicTournamentList, setDisplayedPublicTournamentList,
+                                setSearchTournamentList, setSearchPublicTournamentList
+                            })} />
                             <CustomButton buttonText="Delete" onPress={deleteTournament} buttonColor={error} />
                             <Text style={styles.errorText}>{serverErrorMessage}</Text>
                         </>

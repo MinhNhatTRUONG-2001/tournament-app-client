@@ -32,7 +32,7 @@ const MatchInfoRR = ({ matchInfo, stageInfo }: any) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.keyText}>Group: 
+            <Text style={styles.keyText}>Group:
                 <Text style={styles.valueText}> {matchInfo.group_number}</Text>
             </Text>
             <Text style={styles.keyText}>Leg:
@@ -42,7 +42,7 @@ const MatchInfoRR = ({ matchInfo, stageInfo }: any) => {
                 <Text style={styles.valueText}> {matchInfo.match_number}</Text>
             </Text>
             <Text style={styles.keyText}>Best of:
-                <Text style={styles.valueText}> {matchInfo.team_1_subscores.length !== 0 ? matchInfo.matchInfo.team_1_subscores.length : 'None'}</Text>
+                <Text style={styles.valueText}> {matchInfo.team_1_subscores ? matchInfo.team_1_subscores.length : 'None'}</Text>
             </Text>
             <Text style={styles.keyText}>Start datetime:
                 <Text style={styles.valueText}> {matchInfo.start_datetime ? `${new Date(matchInfo.start_datetime).toLocaleString()} (UTC${getTimezone(new Date(matchInfo.start_datetime))})` : 'N/A'}</Text>
