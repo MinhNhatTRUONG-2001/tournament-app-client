@@ -167,6 +167,8 @@ const MatchListRR = ({ navigation, token, stageId, stageInfo }: any) => {
                                 <DataTable.Title style={{ width: 200, justifyContent: 'center' }}>Team 2 Name</DataTable.Title>
                             </DataTable.Header>
                             {matchList.filter(match => match.group_number.toString() === selectedGroupNumber)
+                                .sort((a: any, b: any) => a.leg_number - b.leg_number)
+                                .sort((a: any, b: any) => a.match_number - b.match_number)
                                 .map((match, index) => {
                                     var team1Name = match.team_1, team2Name = match.team_2
                                     if (match.winner && match.winner === match.team_1) {

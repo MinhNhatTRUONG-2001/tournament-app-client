@@ -75,7 +75,7 @@ const TournamentInfo = ({ navigation, token, username, tournamentList, setTourna
                         <Text style={styles.valueText}> {tournamentInfo.end_date ? `${new Date(tournamentInfo.end_date).toLocaleString()} (UTC${getTimezone(new Date(tournamentInfo.end_date))})` : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Places:
-                        <Text style={styles.valueText}> {tournamentInfo.places.length > 0 ? tournamentInfo.places.join('; ') : 'N/A'}</Text>
+                        <Text style={styles.valueText}> {tournamentInfo.places && tournamentInfo.places.length > 0 ? tournamentInfo.places.join('; ') : 'N/A'}</Text>
                     </Text>
                     <Text style={styles.keyText}>Description:
                         <Text style={styles.valueText}> {tournamentInfo.description ? tournamentInfo.description : 'N/A'}</Text>

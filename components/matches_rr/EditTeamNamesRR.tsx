@@ -80,7 +80,7 @@ const EditTeamNamesRR = ({ route }: any) => {
                         Alert.alert("Update successfully")
                     })
                     .catch(console.error)
-                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${data.stage_id}`, {
+                fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/rr/table_results/${data.stage_id}/${data.group_number}`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }

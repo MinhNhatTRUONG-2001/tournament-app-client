@@ -68,6 +68,9 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
         if (requestBody["winner"] === "") {
             requestBody["winner"] = null
         }
+        else if (requestBody["winner"] === "Draw") {
+            requestBody["winner"] = " "
+        }
         requestBody["team_1_score"] = parseFloat(requestBody["team_1_score"]) || 0
         requestBody["team_2_score"] = parseFloat(requestBody["team_2_score"]) || 0
 
@@ -166,7 +169,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                 }
                             >
                                 <ScrollView>
-                                    {[matchInfo.team_1, matchInfo.team_2].map(team => <Menu.Item
+                                    {[matchInfo.team_1, matchInfo.team_2, 'Draw', ''].map(team => <Menu.Item
                                         onPress={() => {
                                             values["winner"] = team
                                             setShowTeamsMenu(false)
@@ -180,12 +183,38 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
                                 label={`${matchInfo.team_1} Score`}
                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                 value={values.team_1_score.toString()}
+                                onChangeText={(text: string) => {
+                                    handleChange(`team_1_score`)(text)
+                                    values["team_1_score"] = parseFloat(text) || 0
+                                    if (values["team_1_score"] > values["team_2_score"]) {
+                                        handleChange(`winner`)(matchInfo.team_1)
+                                    }
+                                    else if (values["team_1_score"] < values["team_2_score"]) {
+                                        handleChange(`winner`)(matchInfo.team_2)
+                                    }
+                                    else {
+                                        handleChange(`winner`)('Draw')
+                                    }
+                                }}
                             />
                             <FormikCustomTextInput
                                 name="team_2_score"
                                 label={`${matchInfo.team_2} Score`}
                                 keyboardType={Platform.OS === "ios" ? "numbers-and-punctuation" : "numeric"}
                                 value={values.team_2_score.toString()}
+                                onChangeText={(text: string) => {
+                                    handleChange(`team_2_score`)(text)
+                                    values["team_2_score"] = parseFloat(text) || 0
+                                    if (values["team_1_score"] > values["team_2_score"]) {
+                                        handleChange(`winner`)(matchInfo.team_1)
+                                    }
+                                    else if (values["team_1_score"] < values["team_2_score"]) {
+                                        handleChange(`winner`)(matchInfo.team_2)
+                                    }
+                                    else {
+                                        handleChange(`winner`)('Draw')
+                                    }
+                                }}
                             />
                             {(matchInfo.team_1_subscores && matchInfo.team_2_subscores) &&
                                 <>
