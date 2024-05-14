@@ -2,6 +2,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Main from './components/Main';
 import { PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
+import 'react-native-reanimated'
 
 export default function App() {
     return (
