@@ -25,6 +25,7 @@
       "package": "com.nhat.truong.tournamentappclient"
     },
     "web": {
+      "bundler": "metro",
       "favicon": "./assets/favicon.png"
     }
   }

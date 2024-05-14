@@ -6,7 +6,7 @@ import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
 import { Checkbox, Divider, Menu, Text } from "react-native-paper";
 import { useEffect, useState } from "react";
-import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import RNDateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 import { stageFormatsEnum } from "../../data/stageFormatsEnum";
 import CustomTextInput from "../custom/CustomTextInput";
@@ -188,14 +188,32 @@ const NewStage = ({ route, navigation }: any) => {
             values["start_date"] = date?.toISOString()
             setStartDate(date)
         }
-    };
+    }
 
     const changeEndDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
         if (event.type === "set" && date !== undefined) {
             values["end_date"] = date?.toISOString()
             setEndDate(date)
         }
-    };
+    }
+
+    const showStartDatePicker = (values: any) => {
+        DateTimePickerAndroid.open({
+            value: startDate,
+            onChange: (event, date) => changeStartDate(event, date, values),
+            mode: 'date',
+            is24Hour: true,
+        })
+    }
+
+    const showEndDatePicker = (values: any) => {
+        DateTimePickerAndroid.open({
+            value: endDate,
+            onChange: (event, date) => changeEndDate(event, date, values),
+            mode: 'date',
+            is24Hour: true,
+        })
+    }
 
     const createStage = (values: any) => {
         Alert.alert("Confirm stage creation", "The stage configurations can not be changed after creation. Do you want to continue?", [
@@ -293,17 +311,27 @@ const NewStage = ({ route, navigation }: any) => {
                                     <FormikCustomTextInput name="name" label="Name" />
                                     <Text style={styles.text}>Start date</Text>
                                     <View style={styles.datePicker}>
-                                        <RNDateTimePicker
-                                            value={startDate}
-                                            onChange={(event, date) => changeStartDate(event, date, values)}
-                                        />
+                                        {Platform.OS === 'ios' &&
+                                            <RNDateTimePicker
+                                                value={startDate}
+                                                onChange={(event, date) => changeStartDate(event, date, values)}
+                                            />
+                                        }
+                                        {Platform.OS === 'android' &&
+                                            <CustomButton buttonText={startDate.toDateString()} onPress={() => showStartDatePicker(values)} buttonColor={secondary} />
+                                        }
                                     </View>
                                     <Text style={styles.text}>End date</Text>
                                     <View style={styles.datePicker}>
-                                        <RNDateTimePicker
-                                            value={endDate}
-                                            onChange={(event, date) => changeEndDate(event, date, values)}
-                                        />
+                                        {Platform.OS === 'ios' &&
+                                            <RNDateTimePicker
+                                                value={endDate}
+                                                onChange={(event, date) => changeEndDate(event, date, values)}
+                                            />
+                                        }
+                                        {Platform.OS === 'android' &&
+                                            <CustomButton buttonText={endDate.toDateString()} onPress={() => showEndDatePicker(values)} buttonColor={secondary} />
+                                        }
                                     </View>
                                     {(errors && errors.start_date) && <Text style={styles.errorText}>{errors.start_date}</Text>}
                                     <Text style={styles.text}>Places</Text>
@@ -409,7 +437,7 @@ const NewStage = ({ route, navigation }: any) => {
                                                             <ScrollView horizontal>
                                                                 {[...Array(numberOfRounds)].map((_, index) => (
                                                                     <CustomTextInput
-                                                                        label={`Round ${index + 1}`}    
+                                                                        label={`Round ${index + 1}`}
                                                                         key={index}
                                                                         inputMode="numeric"
                                                                         onChangeText={handleChange(`best_of_per_round.${index}`)}

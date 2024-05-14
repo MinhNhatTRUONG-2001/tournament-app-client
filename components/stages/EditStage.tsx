@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
 import { error, primary, secondary } from "../../theme/colors";
@@ -6,7 +6,7 @@ import { FieldArray, Formik } from "formik";
 import * as yup from 'yup';
 import { Text } from "react-native-paper";
 import { useState } from "react";
-import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import RNDateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import moment from "moment";
 import CustomTextInput from "../custom/CustomTextInput";
 
@@ -84,14 +84,32 @@ const EditStage = ({ route, navigation }: any) => {
             values["start_date"] = date?.toISOString()
             setStartDate(date)
         }
-    };
+    }
 
     const changeEndDate = (event: DateTimePickerEvent, date: Date | undefined, values: any) => {
         if (event.type === "set" && date !== undefined) {
             values["end_date"] = date?.toISOString()
             setEndDate(date)
         }
-    };
+    }
+
+    const showStartDatePicker = (values: any) => {
+        DateTimePickerAndroid.open({
+            value: startDate,
+            onChange: (event, date) => changeStartDate(event, date, values),
+            mode: 'date',
+            is24Hour: true,
+        })
+    }
+
+    const showEndDatePicker = (values: any) => {
+        DateTimePickerAndroid.open({
+            value: endDate,
+            onChange: (event, date) => changeEndDate(event, date, values),
+            mode: 'date',
+            is24Hour: true,
+        })
+    }
 
     const updateStage = (values: any) => {
         //console.log(values)
@@ -128,17 +146,27 @@ const EditStage = ({ route, navigation }: any) => {
                             <FormikCustomTextInput name="name" label="Name" />
                             <Text style={styles.text}>Start date</Text>
                             <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={startDate}
-                                    onChange={(event, date) => changeStartDate(event, date, values)}
-                                />
+                                {Platform.OS === 'ios' &&
+                                    <RNDateTimePicker
+                                        value={startDate}
+                                        onChange={(event, date) => changeStartDate(event, date, values)}
+                                    />
+                                }
+                                {Platform.OS === 'android' &&
+                                    <CustomButton buttonText={startDate.toDateString()} onPress={() => showStartDatePicker(values)} buttonColor={secondary} />
+                                }
                             </View>
                             <Text style={styles.text}>End date</Text>
                             <View style={styles.datePicker}>
-                                <RNDateTimePicker
-                                    value={endDate}
-                                    onChange={(event, date) => changeEndDate(event, date, values)}
-                                />
+                                {Platform.OS === 'ios' &&
+                                    <RNDateTimePicker
+                                        value={endDate}
+                                        onChange={(event, date) => changeEndDate(event, date, values)}
+                                    />
+                                }
+                                {Platform.OS === 'android' &&
+                                    <CustomButton buttonText={endDate.toDateString()} onPress={() => showEndDatePicker(values)} buttonColor={secondary} />
+                                }
                             </View>
                             {(errors && errors.start_date) && <Text style={styles.errorText}>{errors.start_date}</Text>}
                             <Text style={styles.text}>Places</Text>

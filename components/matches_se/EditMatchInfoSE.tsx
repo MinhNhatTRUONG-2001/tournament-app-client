@@ -1,12 +1,12 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import FormikCustomTextInput from "../custom/FormikCustomTextInput";
 import CustomButton from "../custom/CustomButton";
-import { error, primary } from "../../theme/colors";
+import { error, primary, secondary } from "../../theme/colors";
 import { Formik } from "formik";
 import * as yup from 'yup';
 import { Text } from "react-native-paper";
 import { useState } from "react";
-import RNDateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import RNDateTimePicker, { DateTimePickerAndroid, DateTimePickerEvent } from "@react-native-community/datetimepicker";
 
 const EditMatchInfoSE = ({ route, navigation }: any) => {
     const styles = StyleSheet.create({
@@ -65,6 +65,23 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
         }
     }
 
+    const showMode = (values: any, currentMode: any) => {
+        DateTimePickerAndroid.open({
+            value: startDatetime,
+            onChange: (event, date) => changeStartDatetime(event, date, values),
+            mode: currentMode,
+            is24Hour: true,
+        })
+    }
+
+    const showDatepicker = (values: any) => {
+        showMode(values, 'date')
+    }
+
+    const showTimepicker = (values: any) => {
+        showMode(values, 'time')
+    }
+
     const updateMatchInfo = (values: any) => {
         //console.log(values)
         fetch(`${process.env.EXPO_PUBLIC_SERVER_URL}/matches/se/${matchInfo.id}/match_info`, {
@@ -99,20 +116,30 @@ const EditMatchInfoSE = ({ route, navigation }: any) => {
                         <ScrollView>
                             <Text style={styles.text}>Start datetime</Text>
                             <View style={styles.datetimeContainer}>
-                                <View>
-                                    <RNDateTimePicker
-                                        value={startDatetime}
-                                        mode="date"
-                                        onChange={(event, date) => changeStartDatetime(event, date, values)}
-                                    />
-                                </View>
-                                <View>
-                                    <RNDateTimePicker
-                                        value={startDatetime}
-                                        mode="time"
-                                        onChange={(event, date) => changeStartDatetime(event, date, values)}
-                                    />
-                                </View>
+                                {Platform.OS === 'ios' &&
+                                    <>
+                                        <View>
+                                            <RNDateTimePicker
+                                                value={startDatetime}
+                                                mode="date"
+                                                onChange={(event, date) => changeStartDatetime(event, date, values)}
+                                            />
+                                        </View>
+                                        <View>
+                                            <RNDateTimePicker
+                                                value={startDatetime}
+                                                mode="time"
+                                                onChange={(event, date) => changeStartDatetime(event, date, values)}
+                                            />
+                                        </View>
+                                    </>
+                                }
+                                {Platform.OS === 'android' &&
+                                    <>
+                                        <CustomButton buttonText={startDatetime.toDateString()} onPress={() => showDatepicker(values)} buttonColor={secondary} />
+                                        <CustomButton buttonText={startDatetime.toTimeString()} onPress={() => showTimepicker(values)} buttonColor={secondary} />
+                                    </>
+                                }
                             </View>
                             <FormikCustomTextInput name="place" label="Place" />
                             <FormikCustomTextInput
