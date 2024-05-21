@@ -65,6 +65,7 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
 
     const updateMatchScores = (values: any) => {
         var requestBody = { ...values }
+        console.log(requestBody)
         if (requestBody["winner"] === "") {
             requestBody["winner"] = null
         }
@@ -73,26 +74,27 @@ const EditMatchScoresRR = ({ route, navigation }: any) => {
         }
         requestBody["team_1_score"] = parseFloat(requestBody["team_1_score"]) || 0
         requestBody["team_2_score"] = parseFloat(requestBody["team_2_score"]) || 0
-
-        if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
-            requestBody["team_1_subscores"] = null
-            requestBody["team_2_subscores"] = null
-        }
-        else {
-            for (var i = 0; i < requestBody["team_1_subscores"].length; i++) {
-                if (!requestBody["team_1_subscores"][i]) {
-                    requestBody["team_1_subscores"][i] = 0
-                }
-                else {
-                    requestBody["team_1_subscores"][i] = parseFloat(requestBody["team_1_subscores"][i]) || 0
-                }
+        if (requestBody["team_1_subscores"] && requestBody["team_2_subscores"]) {
+            if (requestBody["team_1_subscores"].length === 0 && requestBody["team_2_subscores"].length === 0) {
+                requestBody["team_1_subscores"] = null
+                requestBody["team_2_subscores"] = null
             }
-            for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
-                if (!requestBody["team_2_subscores"][i]) {
-                    requestBody["team_2_subscores"][i] = 0
+            else {
+                for (var i = 0; i < requestBody["team_1_subscores"].length; i++) {
+                    if (!requestBody["team_1_subscores"][i]) {
+                        requestBody["team_1_subscores"][i] = 0
+                    }
+                    else {
+                        requestBody["team_1_subscores"][i] = parseFloat(requestBody["team_1_subscores"][i]) || 0
+                    }
                 }
-                else {
-                    requestBody["team_2_subscores"][i] = parseFloat(requestBody["team_2_subscores"][i]) || 0
+                for (var i = 0; i < requestBody["team_2_subscores"].length; i++) {
+                    if (!requestBody["team_2_subscores"][i]) {
+                        requestBody["team_2_subscores"][i] = 0
+                    }
+                    else {
+                        requestBody["team_2_subscores"][i] = parseFloat(requestBody["team_2_subscores"][i]) || 0
+                    }
                 }
             }
         }
